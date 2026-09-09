@@ -2640,9 +2640,9 @@ function renderProductGrid(){
     const oos=p.stock<=0;
     const expired=p.expiryDate&&p.expiryDate<todayStr;
     const low=p.stock>0&&p.stock<=p.threshold;
-    const blocked=oos||expired;
+    const blocked=expired; // out-of-stock no longer blocks selling
     const activePrice=priceForTier(p,activePricingTier);
-    return`<div class="product-card${oos?' out-of-stock':''}${expired?' expired':''}" onclick="${blocked?'':' addToCart(\''+p.id+'\')'}" title="${expired?'EXPIRED — cannot sell':''}">
+    return`<div class="product-card${expired?' expired':''}" onclick="${blocked?'':' addToCart(\''+p.id+'\')'}" title="${expired?'EXPIRED — cannot sell':''}">
       ${low&&!expired?`<span class="badge badge-amber prod-badge">Low</span>`:''}
       ${oos&&!expired?`<span class="badge badge-red prod-badge">Out</span>`:''}
       ${expired?`<span class="badge badge-red prod-badge" style="font-size:9px">EXPIRED</span>`:''}
@@ -2656,13 +2656,12 @@ function renderProductGrid(){
 
 function addToCart(productId){
   const p=DB.all('products').find(x=>x.id===productId);
-  if(!p||p.stock<=0) return;
+  if(!p) return;
   const todayStr=new Date().toISOString().slice(0,10);
   if(p.expiryDate&&p.expiryDate<todayStr){toast('Cannot sell expired product: '+p.name,'error');return;}
   const activePrice=priceForTier(p,activePricingTier);
   const existing=cart.find(i=>i.productId===productId);
   if(existing){
-    if(existing.qty>=p.stock){toast('Not enough stock','warning');return;}
     existing.qty++;
     existing.sellPrice=activePrice;
   } else {
@@ -3501,7 +3500,7 @@ function saveAdjustment(){
   const p=DB.all('products').find(x=>x.id===productId);
   if(!p) return;
   const delta=['damage'].includes(type)?-qty:qty;
-  const newStock=Math.max(0,p.stock+delta);
+  const newStock=p.stock+delta;
   DB.update('products',productId,{stock:newStock});
   DB.push('inv_history',{id:uid(),productId,productName:p.name,type,qty:delta,stockAfter:newStock,userId:currentUser.id,userName:currentUser.name,notes,date:now()});
   toast(`Stock adjusted: ${kes(p.name)} → ${newStock} units`);
