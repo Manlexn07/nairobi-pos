@@ -542,9 +542,6 @@ th.sort-asc .sort-icon,th.sort-desc .sort-icon{opacity:1;color:var(--green)}
       </div>
       <button type="submit" class="btn btn-primary btn-lg w-full" style="margin-top:4px">Sign In</button>
     </form>
-    <p style="text-align:center;margin-top:16px;font-size:12px;color:var(--gray400)">
-      Demo: admin/admin · manager/manager · cashier/cashier · stock/stock
-    </p>
   </div>
 </div>
 
@@ -2159,9 +2156,13 @@ const SB=(()=>{
             tables[row.table_name].push(row.data);
           }
         });
-        // Write arrays only when Supabase has data (don't overwrite with empty)
-        Object.entries(tables).forEach(([table,records])=>{
-          if(records.length>0)DB.set(table,records);
+        // Always overwrite localStorage from Supabase (source of truth).
+        // This ensures cleared tables (sales, etc.) propagate to all devices,
+        // and updated records (passwords, stock) sync correctly.
+        // Exception: never wipe users to empty — prevents login lockout on first load.
+        SB_TABLES.forEach(table=>{
+          if(table==='users'&&!(tables[table]&&tables[table].length>0))return;
+          DB.set(table, tables[table]||[]);
         });
         await _flush();
       }catch(e){console.warn('SB.syncAll error:',e);}
@@ -2649,6 +2650,7 @@ function renderProductGrid(){
       <div class="prod-name">${p.name}</div>
       <div class="prod-price">${kes(activePrice)}</div>
       ${p.buyPrice?`<div style="font-size:10px;color:var(--gray400);margin-top:1px">Cost: ${kes(p.buyPrice)}</div>`:''}
+      ${p.wholesalePrice?`<div style="font-size:10px;color:var(--blue);margin-top:1px">Whl: ${kes(p.wholesalePrice)}</div>`:''}
       <div class="prod-stock">Stock: ${p.stock}${p.expiryDate&&!expired?`<br><span style="font-size:10px;color:var(--amber)">Exp: ${fmtDate(p.expiryDate)}</span>`:''}${expired?`<br><span style="font-size:10px;color:var(--red);font-weight:700">⚠ EXPIRED</span>`:''}</div>
     </div>`;
   }).join('');
