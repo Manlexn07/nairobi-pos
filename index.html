@@ -665,6 +665,7 @@ th.sort-asc .sort-icon,th.sort-desc .sort-icon{opacity:1;color:var(--green)}
         <button class="btn btn-secondary btn-sm" onclick="navigate('quotes')" id="quote-btn" style="display:none">📋 Quote</button>
         <span id="topbar-date" style="font-size:12px;color:var(--gray500)"></span>
         <span id="topbar-time" style="font-size:12px;color:var(--gray500);min-width:70px"></span>
+        <span id="sync-status" title="Cloud sync: initialising" style="font-size:14px;cursor:default;color:var(--gray400)">●</span>
       </div>
     </header>
 
@@ -2065,18 +2066,140 @@ th.sort-asc .sort-icon,th.sort-desc .sort-icon{opacity:1;color:var(--green)}
 <!-- Toast Container -->
 <div id="toast-container"></div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
 /* ════════════════════════════════════════════════
    CORE DATA STORE
 ════════════════════════════════════════════════ */
+/* Tables synced to Supabase */
+const SB_TABLES=new Set(['users','products','sales','customers','payments','returns','suppliers','inv_history','quotes','campaigns','held_sales']);
+
 const DB = {
   get(k){try{return JSON.parse(localStorage.getItem('npos_'+k))||null}catch{return null}},
   set(k,v){localStorage.setItem('npos_'+k,JSON.stringify(v))},
-  push(k,item){const arr=DB.get(k)||[];arr.push(item);DB.set(k,arr);return item},
-  update(k,id,patch){const arr=DB.get(k)||[];const i=arr.findIndex(x=>x.id===id);if(i>-1){arr[i]={...arr[i],...patch};DB.set(k,arr);return arr[i]}return null},
-  remove(k,id){const arr=(DB.get(k)||[]).filter(x=>x.id!==id);DB.set(k,arr)},
+  push(k,item){const arr=DB.get(k)||[];arr.push(item);DB.set(k,arr);if(SB_TABLES.has(k))SB.upsert(k,item);return item},
+  update(k,id,patch){const arr=DB.get(k)||[];const i=arr.findIndex(x=>x.id===id);if(i>-1){arr[i]={...arr[i],...patch};DB.set(k,arr);if(SB_TABLES.has(k))SB.upsert(k,arr[i]);return arr[i]}return null},
+  remove(k,id){const arr=(DB.get(k)||[]).filter(x=>x.id!==id);DB.set(k,arr);if(SB_TABLES.has(k))SB.delete(k,id);},
   all(k){return DB.get(k)||[]}
 };
+
+/* ════════════════════════════════════════════════
+   SUPABASE SYNC LAYER
+════════════════════════════════════════════════ */
+const SUPABASE_URL='https://ynteadebfphbvilusfua.supabase.co';
+const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InludGVhZGViZnBoYnZpbHVzZnVhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg4OTY0MTcsImV4cCI6MjEwNDQ3MjQxN30.IeRLDHWWV2ikEddMVPQSZT_Ww60ivL0r-AObRE398bA';
+const SB_QUEUE='npos__sb_queue';
+
+const SB=(()=>{
+  let _c=null; // supabase client
+
+  function _setStatus(online){
+    const el=document.getElementById('sync-status');
+    if(!el)return;
+    el.textContent='●';
+    el.title=online?'Cloud sync: connected':'Cloud sync: offline – changes queued';
+    el.style.color=online?'#16a34a':'#d97706';
+  }
+
+  function _queue(op){
+    const q=JSON.parse(localStorage.getItem(SB_QUEUE)||'[]');
+    q.push({...op,_ts:Date.now()});
+    localStorage.setItem(SB_QUEUE,JSON.stringify(q));
+  }
+
+  async function _flush(){
+    if(!_c||!navigator.onLine)return;
+    const q=JSON.parse(localStorage.getItem(SB_QUEUE)||'[]');
+    if(!q.length)return;
+    const failed=[];
+    for(const op of q){
+      try{
+        if(op.op==='upsert'){
+          const {error}=await _c.from('sync_store').upsert(
+            {table_name:op.table,record_id:op.record.id||op.record._id||'_config',data:op.record,deleted:false,updated_at:new Date().toISOString()},
+            {onConflict:'table_name,record_id'}
+          );
+          if(error)failed.push(op);
+        }else if(op.op==='delete'){
+          const {error}=await _c.from('sync_store').upsert(
+            {table_name:op.table,record_id:op.id,data:{id:op.id},deleted:true,updated_at:new Date().toISOString()},
+            {onConflict:'table_name,record_id'}
+          );
+          if(error)failed.push(op);
+        }
+      }catch(e){failed.push(op);}
+    }
+    localStorage.setItem(SB_QUEUE,JSON.stringify(failed));
+    if(!failed.length&&q.length>0)toast('☁️ Synced '+q.length+' offline change'+(q.length>1?'s':''));
+  }
+
+  return {
+    init(){
+      try{_c=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);}
+      catch(e){console.warn('Supabase init failed:',e);return;}
+      window.addEventListener('online',()=>{_setStatus(true);_flush();});
+      window.addEventListener('offline',()=>_setStatus(false));
+      // Delay status set so DOM is ready
+      setTimeout(()=>_setStatus(navigator.onLine),100);
+    },
+
+    async syncAll(){
+      if(!_c||!navigator.onLine)return;
+      try{
+        const {data,error}=await _c.from('sync_store').select('table_name,record_id,data').eq('deleted',false);
+        if(error||!data)return;
+        // Group records by table
+        const tables={};
+        data.forEach(row=>{
+          if(!tables[row.table_name])tables[row.table_name]=[];
+          // _config records are whole-object stores (settings, targets)
+          if(row.record_id==='_config'){
+            DB.set(row.table_name,row.data);
+          }else{
+            tables[row.table_name].push(row.data);
+          }
+        });
+        // Write arrays only when Supabase has data (don't overwrite with empty)
+        Object.entries(tables).forEach(([table,records])=>{
+          if(records.length>0)DB.set(table,records);
+        });
+        await _flush();
+      }catch(e){console.warn('SB.syncAll error:',e);}
+    },
+
+    async upsert(table,record){
+      if(!_c){_queue({op:'upsert',table,record});return;}
+      if(!navigator.onLine){_queue({op:'upsert',table,record});return;}
+      try{
+        const recId=record.id||record._id||'_config';
+        const {error}=await _c.from('sync_store').upsert(
+          {table_name:table,record_id:recId,data:record,deleted:false,updated_at:new Date().toISOString()},
+          {onConflict:'table_name,record_id'}
+        );
+        if(error)_queue({op:'upsert',table,record});
+      }catch(e){_queue({op:'upsert',table,record});}
+    },
+
+    async delete(table,id){
+      if(!_c){_queue({op:'delete',table,id});return;}
+      if(!navigator.onLine){_queue({op:'delete',table,id});return;}
+      try{
+        const {error}=await _c.from('sync_store').upsert(
+          {table_name:table,record_id:id,data:{id},deleted:true,updated_at:new Date().toISOString()},
+          {onConflict:'table_name,record_id'}
+        );
+        if(error)_queue({op:'delete',table,id});
+      }catch(e){_queue({op:'delete',table,id});}
+    },
+
+    // Sync whole-object stores (settings, targets, profitTargets)
+    syncObj(key,obj){
+      this.upsert(key,{...obj,id:'_config'});
+    },
+
+    flush:_flush
+  };
+})();
 
 const uid=()=>Math.random().toString(36).slice(2,10).toUpperCase();
 const now=()=>new Date().toISOString();
@@ -2348,6 +2471,12 @@ function logout(){
    APP INIT
 ════════════════════════════════════════════════ */
 function initApp(){
+  SB.init();
+  SB.syncAll().then(()=>{
+    // Re-render current page after cloud data loaded
+    const access=ROLE_ACCESS[currentUser.role];
+    navigate(access[0]);
+  });
   updateSidebarUser();
   applyRoleAccess();
   const access=ROLE_ACCESS[currentUser.role];
@@ -4376,6 +4505,8 @@ function saveTargets(){
   });
   DB.set('targets',targets);
   DB.set('profitTargets',profitTargets);
+  SB.syncObj('targets',targets);
+  SB.syncObj('profitTargets',profitTargets);
   toast('Targets saved');
 }
 
@@ -4390,6 +4521,7 @@ function setLbMode(mode){
 function saveSettings(){
   const s={bizName:document.getElementById('set-biz-name').value.trim(),location:document.getElementById('set-location').value.trim(),phone:document.getElementById('set-phone').value.trim(),vatRate:parseFloat(document.getElementById('set-vat').value)||16,receiptFooter:document.getElementById('set-footer').value.trim(),vatEnabled:document.getElementById('set-vat-enabled').checked};
   DB.set('settings',s);
+  SB.syncObj('settings',s);
   document.getElementById('sb-business').textContent=s.bizName||'Your Business';
   toast('Settings saved');
 }
