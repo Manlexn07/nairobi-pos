@@ -1197,7 +1197,7 @@ th.sort-asc .sort-icon,th.sort-desc .sort-icon{opacity:1;color:var(--green)}
           <div class="card" style="margin-top:16px">
             <div class="card-header"><h3>💾 Backup &amp; Restore</h3></div>
             <div class="card-body" style="display:flex;flex-direction:column;gap:12px">
-              <p style="font-size:13px;color:var(--gray500);margin:0">Backups are created automatically before any stock import or data reset. You can also download a backup at any time.</p>
+              <p style="font-size:13px;color:var(--gray500);margin:0">Restore points are saved automatically before every stock import or data reset — both on this device (💾) and in the cloud (☁️). Cloud backups are accessible from any device.</p>
               <div style="display:flex;gap:8px;flex-wrap:wrap">
                 <button class="btn btn-secondary" onclick="downloadBackup()">📥 Download Backup (JSON)</button>
                 <label class="btn btn-secondary" style="cursor:pointer">
@@ -1207,7 +1207,7 @@ th.sort-asc .sort-icon,th.sort-desc .sort-icon{opacity:1;color:var(--green)}
                 <button class="btn btn-secondary btn-sm" onclick="createBackupSnapshot('Manual backup');renderBackupList()" style="margin-left:auto">+ Save Restore Point</button>
               </div>
               <div>
-                <div style="font-size:12px;font-weight:600;color:var(--gray600);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">Restore Points (last 5)</div>
+                <div style="font-size:12px;font-weight:600;color:var(--gray600);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">Restore Points (local 💾 + cloud ☁️)</div>
                 <div id="backup-list" style="display:flex;flex-direction:column;gap:6px"></div>
               </div>
             </div>
@@ -2198,7 +2198,19 @@ const SB=(()=>{
       this.upsert(key,{...obj,id:'_config'});
     },
 
-    flush:_flush
+    flush:_flush,
+
+    // Fetch records for a table from Supabase (used by backup list)
+    async query(table,{limit=20}={}){
+      if(!_c||!navigator.onLine)return[];
+      try{
+        let q=_c.from('sync_store').select('data').eq('table_name',table).eq('deleted',false).order('updated_at',{ascending:false});
+        if(limit)q=q.limit(limit);
+        const{data,error}=await q;
+        if(error||!data)return[];
+        return data.map(r=>r.data);
+      }catch(e){return[];}
+    }
   };
 })();
 
@@ -4565,7 +4577,7 @@ function _collectAllData(){
   return data;
 }
 
-/* ── Create an in-browser restore point ── */
+/* ── Create a restore point (localStorage + Supabase cloud) ── */
 function createBackupSnapshot(label){
   try{
     const snap={
@@ -4574,11 +4586,14 @@ function createBackupSnapshot(label){
       timestamp:Date.now(),
       data:_collectAllData(),
     };
+    // Save locally
     let snaps=[];
     try{snaps=JSON.parse(localStorage.getItem('npos_backups'))||[];}catch{}
     snaps.unshift(snap);
     if(snaps.length>MAX_SNAPSHOTS) snaps=snaps.slice(0,MAX_SNAPSHOTS);
     localStorage.setItem('npos_backups',JSON.stringify(snaps));
+    // Also push to Supabase (fire-and-forget; large payload stored as JSONB)
+    SB.upsert('backups',snap);
     return true;
   }catch(e){
     if(e.name==='QuotaExceededError'){
@@ -4625,11 +4640,18 @@ function restoreFromFile(file){
   );
 }
 
-/* ── Restore from in-app snapshot ── */
-function restoreFromSnapshot(id){
+/* ── Restore from in-app snapshot (local or cloud) ── */
+async function restoreFromSnapshot(id){
   let snaps=[];
   try{snaps=JSON.parse(localStorage.getItem('npos_backups'))||[];}catch{}
-  const snap=snaps.find(s=>s.id===id);
+  let snap=snaps.find(s=>s.id===id);
+  // If not found locally, try fetching from Supabase
+  if(!snap){
+    try{
+      const cloudSnaps=await SB.query('backups',{limit:20});
+      snap=cloudSnaps.find(s=>s&&s.id===id);
+    }catch{}
+  }
   if(!snap){toast('Restore point not found','error');return;}
   const label=snap.label;
   const ts=new Date(snap.timestamp).toLocaleString('en-KE');
@@ -4658,24 +4680,41 @@ function deleteSnapshot(id){
   try{snaps=JSON.parse(localStorage.getItem('npos_backups'))||[];}catch{}
   snaps=snaps.filter(s=>s.id!==id);
   localStorage.setItem('npos_backups',JSON.stringify(snaps));
+  SB.delete('backups',id);
   renderBackupList();
 }
 
-/* ── Render backup list in Settings ── */
-function renderBackupList(){
+/* ── Render backup list in Settings (merges local + cloud) ── */
+async function renderBackupList(){
   const el=document.getElementById('backup-list');
   if(!el) return;
-  let snaps=[];
-  try{snaps=JSON.parse(localStorage.getItem('npos_backups'))||[];}catch{}
-  if(!snaps.length){
+  el.innerHTML=`<div style="font-size:12px;color:var(--gray400);padding:4px 0">Loading restore points…</div>`;
+
+  // Local snapshots
+  let local=[];
+  try{local=JSON.parse(localStorage.getItem('npos_backups'))||[];}catch{}
+  const localIds=new Set(local.map(s=>s.id));
+
+  // Cloud snapshots (fetch from Supabase, exclude ones already in local)
+  let cloud=[];
+  try{cloud=(await SB.query('backups',{limit:20})).filter(s=>s&&s.id&&!localIds.has(s.id));}catch{}
+
+  // Merge: local first (most recent), then cloud-only, sorted by timestamp desc
+  const all=[...local,...cloud].sort((a,b)=>b.timestamp-a.timestamp).slice(0,10);
+
+  if(!all.length){
     el.innerHTML=`<div style="font-size:12px;color:var(--gray400);padding:8px 0">No restore points yet. They are created automatically before imports and resets.</div>`;
     return;
   }
-  el.innerHTML=snaps.map(s=>{
+  el.innerHTML=all.map(s=>{
     const ts=new Date(s.timestamp).toLocaleString('en-KE',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
-    const prodCount=(s.data.products||[]).length;
-    const salesCount=(s.data.sales||[]).length;
+    const prodCount=(s.data&&s.data.products||[]).length;
+    const salesCount=(s.data&&s.data.sales||[]).length;
+    const isCloud=!localIds.has(s.id);
+    const icon=isCloud?'☁️':'💾';
+    const sourceTip=isCloud?'Cloud backup (not on this device)':'Local + cloud backup';
     return `<div style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--gray50);border-radius:6px;font-size:12px">
+      <div style="font-size:16px;flex-shrink:0" title="${sourceTip}">${icon}</div>
       <div style="flex:1;min-width:0">
         <div style="font-weight:600;color:var(--gray800);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${s.label}</div>
         <div style="color:var(--gray500)">${ts} · ${prodCount} products · ${salesCount} sales</div>
