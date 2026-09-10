@@ -2280,13 +2280,28 @@ const SB=(()=>{
             tables[row.table_name].push(row.data);
           }
         });
-        // Always overwrite localStorage from Supabase (source of truth).
-        // This ensures cleared tables (sales, etc.) propagate to all devices,
-        // and updated records (passwords, stock) sync correctly.
-        // Exception: never wipe users to empty — prevents login lockout on first load.
+        // Sync strategy:
+        // - Supabase has records → Supabase wins (propagates deletes/changes across devices).
+        // - Supabase is empty for a table but local has records → migrate local UP to
+        //   Supabase and keep local intact. Handles tables newly added to SB_TABLES
+        //   (like receipts, held_receivings) that had existing local data before syncing
+        //   was enabled, preventing accidental wipe on first sync.
+        // - Exception: never wipe users to empty — prevents login lockout.
         SB_TABLES.forEach(table=>{
           if(table==='users'&&!(tables[table]&&tables[table].length>0))return;
-          DB.set(table, tables[table]||[]);
+          const cloudRecords=tables[table]||[];
+          if(cloudRecords.length===0){
+            let local=null;
+            try{local=JSON.parse(localStorage.getItem('npos_'+table));}catch{}
+            if(Array.isArray(local)&&local.length>0){
+              // Local has data cloud doesn't — migrate up, keep local
+              local.forEach(r=>SB.upsert(table,r));
+            }else{
+              DB.set(table,[]);
+            }
+          }else{
+            DB.set(table,cloudRecords);
+          }
         });
         await _flush();
       }catch(e){console.warn('SB.syncAll error:',e);}
@@ -2860,8 +2875,8 @@ function recallHeld(id){
   const sel=document.getElementById('pos-customer-select');
   sel.value=held.customerId||'';
   onPOSCustomerChange();
-  // Remove from held
-  DB.set('held_sales',(DB.all('held_sales')||[]).filter(h=>h.id!==id));
+  // Remove from held (use DB.remove so Supabase is also soft-deleted)
+  DB.remove('held_sales',id);
   renderCart();
   renderHeldBar();
   switchPosTab('cart'); // show recalled cart items on mobile
@@ -2873,7 +2888,7 @@ function recallHeld(id){
 
 function deleteHeld(id){
   if(!confirm('Discard this held sale?')) return;
-  DB.set('held_sales',(DB.all('held_sales')||[]).filter(h=>h.id!==id));
+  DB.remove('held_sales',id);
   renderHeldBar();
 }
 
@@ -4823,18 +4838,25 @@ function exportSalesCSV(){
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='sales-export.csv';document.body.appendChild(a);a.click();document.body.removeChild(a);
 }
 function clearSalesData(){
-  showConfirm('Clear Sales Data','A restore point will be saved first, then ALL sales records will be deleted. Continue?',()=>{
+  showConfirm('Clear Sales Data','A restore point will be saved first, then ALL sales records will be deleted across all devices. Continue?',()=>{
     createBackupSnapshot('Before sales clear');
-    DB.set('sales',[]);
+    // Delete each record individually so Supabase soft-deletes propagate to all devices
+    (DB.all('sales')||[]).forEach(s=>DB.remove('sales',s.id));
     toast('Sales data cleared — restore point saved');
     renderBackupList();
   });
 }
 function resetAllData(){
-  showConfirm('Reset All Data','A restore point will be saved first, then all data reloads as demo data. Continue?',()=>{
+  showConfirm('Reset All Data','A restore point will be saved first, then ALL data on ALL devices will be wiped and demo data reloaded. Continue?',()=>{
     createBackupSnapshot('Before full reset');
+    // Soft-delete every record in every synced table from Supabase so other devices also reset
+    const skipTables=new Set(['users','settings','targets','profitTargets','seeded']);
+    SB_TABLES.forEach(table=>{
+      if(skipTables.has(table)) return;
+      (DB.all(table)||[]).forEach(r=>{const id=r.id||r._id;if(id)DB.remove(table,id);});
+    });
     setTimeout(()=>{
-      ['users','products','sales','inv_history','settings','customers','payments','suppliers','returns','targets','held_sales','quotes','receipts','campaigns','seeded'].forEach(k=>localStorage.removeItem('npos_'+k));
+      ['users','products','sales','inv_history','settings','customers','payments','suppliers','returns','targets','held_sales','quotes','receipts','campaigns','held_receivings','supplier_payments','seeded'].forEach(k=>localStorage.removeItem('npos_'+k));
       toast('Data reset — reloading…');
       setTimeout(()=>location.reload(),800);
     },300);
@@ -6146,7 +6168,7 @@ function setQuoteStatus(id,status){
 
 function deleteQuote(id){
   if(!confirm('Delete this quote permanently?')) return;
-  DB.set('quotes',(DB.all('quotes')||[]).filter(q=>q.id!==id));
+  DB.remove('quotes',id);
   renderQuotesHistory();
 }
 
@@ -6864,8 +6886,7 @@ function deleteCampaign(){
   const id=document.getElementById('camp-id').value;
   if(!id) return;
   if(!confirm('Delete this campaign? This cannot be undone.')) return;
-  const all=(DB.all('campaigns')||[]).filter(c=>c.id!==id);
-  DB.set('campaigns',all);
+  DB.remove('campaigns',id);
   toast('Campaign deleted');
   closeModal('campaign-modal-overlay');
   renderCampaigns();
