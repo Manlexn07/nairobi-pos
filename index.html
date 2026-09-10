@@ -503,6 +503,41 @@ th.sort-asc .sort-icon,th.sort-desc .sort-icon{opacity:1;color:var(--green)}
 .camp-status-scheduled{background:#dbeafe;color:#1d4ed8;padding:2px 8px;border-radius:9999px;font-size:11px;font-weight:700}
 .camp-status-ended{background:#f3f4f6;color:#6b7280;padding:2px 8px;border-radius:9999px;font-size:11px;font-weight:700}
 
+/* ── NOTIFICATION BELL ── */
+.notif-bell{position:relative;display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;cursor:pointer;border:none;background:transparent;font-size:18px;color:var(--gray600);transition:background .15s}
+.notif-bell:hover{background:var(--gray100)}
+.notif-badge{position:absolute;top:3px;right:3px;min-width:16px;height:16px;background:var(--red);color:#fff;border-radius:9999px;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 3px;line-height:1;border:2px solid #fff;pointer-events:none}
+.notif-dropdown{position:absolute;top:calc(100% + 8px);right:0;width:340px;background:#fff;border:1px solid var(--gray200);border-radius:var(--radius);box-shadow:var(--shadow-lg);z-index:2000;max-height:420px;display:flex;flex-direction:column}
+.notif-dropdown-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px 10px;border-bottom:1px solid var(--gray100);flex-shrink:0}
+.notif-dropdown-header h4{font-size:13px;font-weight:700;color:var(--gray800);margin:0}
+.notif-list{overflow-y:auto;flex:1}
+.notif-item{display:flex;align-items:flex-start;gap:10px;padding:11px 16px;border-bottom:1px solid var(--gray100);cursor:pointer;transition:background .1s}
+.notif-item:hover{background:var(--gray50)}
+.notif-item:last-child{border-bottom:none}
+.notif-icon{font-size:18px;flex-shrink:0;margin-top:1px}
+.notif-content{flex:1;min-width:0}
+.notif-title{font-size:12px;font-weight:600;color:var(--gray800)}
+.notif-body{font-size:11px;color:var(--gray500);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.notif-empty{padding:24px;text-align:center;color:var(--gray400);font-size:13px}
+.notif-wrapper{position:relative}
+
+/* ── HELD RECEIVINGS ── */
+.held-recv-card{background:#fffbeb;border:1px solid #fde68a;border-radius:var(--radius);padding:10px 14px;display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.held-recv-card:last-child{margin-bottom:0}
+.recv-quick-bar{display:flex;align-items:center;gap:8px;padding:10px 0 4px;position:relative}
+
+/* ── SUPPLIER ACCOUNTS ── */
+.sup-acc-table td,.sup-acc-table th{padding:10px 12px;font-size:13px}
+.aging-chip{display:inline-block;padding:2px 8px;border-radius:9999px;font-size:11px;font-weight:600}
+.aging-current{background:#dcfce7;color:#15803d}
+.aging-30{background:#dbeafe;color:#1d4ed8}
+.aging-60{background:#fef3c7;color:#d97706}
+.aging-90{background:#fee2e2;color:#dc2626}
+.stmt-row{display:flex;gap:12px;padding:9px 0;border-bottom:1px solid var(--gray100);font-size:13px;align-items:center}
+.stmt-row:last-child{border-bottom:none}
+.stmt-debit{color:var(--red);font-weight:600}
+.stmt-credit{color:var(--green);font-weight:600}
+
 /* ── PRINT STYLES ── */
 @media print{
   body{background:#fff!important}
@@ -662,31 +697,26 @@ th.sort-asc .sort-icon,th.sort-desc .sort-icon{opacity:1;color:var(--green)}
         <button class="btn btn-secondary btn-sm" onclick="navigate('quotes')" id="quote-btn" style="display:none">📋 Quote</button>
         <span id="topbar-date" style="font-size:12px;color:var(--gray500)"></span>
         <span id="topbar-time" style="font-size:12px;color:var(--gray500);min-width:70px"></span>
+        <div class="notif-wrapper">
+          <button class="notif-bell" id="notif-bell-btn" onclick="toggleNotifDropdown()" title="Notifications" aria-label="Notifications">
+            🔔
+            <span class="notif-badge hidden" id="notif-badge">0</span>
+          </button>
+          <div class="notif-dropdown hidden" id="notif-dropdown">
+            <div class="notif-dropdown-header">
+              <h4>Notifications</h4>
+              <button onclick="dismissAllNotifs()" style="font-size:11px;color:var(--gray400);background:none;border:none;cursor:pointer;padding:0">Clear all</button>
+            </div>
+            <div class="notif-list" id="notif-list">
+              <div class="notif-empty">No notifications</div>
+            </div>
+          </div>
+        </div>
         <span id="sync-status" title="Cloud sync: initialising" style="font-size:14px;cursor:default;color:var(--gray400)">●</span>
       </div>
     </header>
 
-    <!-- Overdue Accounts Banner -->
-    <div id="overdue-banner" class="overdue-banner hidden">
-      <span class="ob-icon">⚠️</span>
-      <div class="ob-text">
-        <strong id="ob-title">Overdue Accounts</strong>
-        <span id="ob-body">Some customer accounts are overdue for payment.</span>
-      </div>
-      <button class="ob-dismiss" onclick="navigate('customers')">View Accounts</button>
-      <button class="ob-dismiss" style="margin-left:4px" onclick="document.getElementById('overdue-banner').classList.add('hidden')">✕</button>
-    </div>
 
-    <!-- Active Campaign Banner -->
-    <div id="marketing-banner" class="mkt-banner hidden">
-      <span class="ob-icon">🎯</span>
-      <div class="ob-text" style="flex:1">
-        <strong>Active Campaign</strong>
-        <span id="mb-text" style="margin-left:8px;font-size:13px;opacity:.9"></span>
-      </div>
-      <button class="ob-dismiss" onclick="navigate('marketing')" style="background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.4);color:#fff;padding:4px 12px;border-radius:6px;cursor:pointer;font-size:12px">View</button>
-      <button class="ob-dismiss" style="margin-left:6px;background:transparent;border:none;color:#fff;cursor:pointer;font-size:16px" onclick="document.getElementById('marketing-banner').classList.add('hidden')">✕</button>
-    </div>
 
     <div class="content" id="main-content">
 
@@ -927,10 +957,33 @@ th.sort-asc .sort-icon,th.sort-desc .sort-icon{opacity:1;color:var(--green)}
             </table>
           </div>
         </div>
+
+        <!-- Supplier Accounts -->
+        <div class="card" style="margin-top:16px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+            <h3 style="margin:0;font-size:14px;font-weight:600">📒 Supplier Accounts</h3>
+          </div>
+          <div class="table-wrap">
+            <table class="sup-acc-table" style="width:100%;border-collapse:collapse">
+              <thead><tr>
+                <th>Supplier</th><th>Total Invoiced</th><th>Total Paid</th>
+                <th>Balance Owed</th><th>Debt Aging</th><th>Actions</th>
+              </tr></thead>
+              <tbody id="sup-acc-tbody"></tbody>
+            </table>
+          </div>
+        </div>
       </div>
 
       <!-- ══ PAGE: RECEIVING ══ -->
       <div id="page-receiving" class="page">
+
+        <!-- Held receivings section -->
+        <div id="held-recv-section" style="margin-bottom:16px;display:none">
+          <div style="font-size:12px;font-weight:600;color:var(--gray600);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">⏸ On Hold</div>
+          <div id="held-recv-list"></div>
+        </div>
+
         <!-- Header toolbar -->
         <div class="inv-toolbar" style="margin-bottom:16px;flex-wrap:wrap;gap:10px">
           <div style="display:flex;gap:10px;flex:1;flex-wrap:wrap">
@@ -940,17 +993,27 @@ th.sort-asc .sort-icon,th.sort-desc .sort-icon{opacity:1;color:var(--green)}
             </select>
             <input class="form-control" type="date" id="recv-date" style="max-width:160px">
           </div>
-          <button class="btn btn-primary" onclick="postReceipt()" style="margin-left:auto">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><polyline points="20 6 9 17 4 12"/></svg>
-            Post Receipt
-          </button>
+          <div style="display:flex;gap:8px;margin-left:auto">
+            <button class="btn btn-secondary" onclick="holdReceiving()" title="Save this receiving session and start a new one">⏸ Hold</button>
+            <button class="btn btn-primary" onclick="postReceipt()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><polyline points="20 6 9 17 4 12"/></svg>
+              Post Receipt
+            </button>
+          </div>
         </div>
 
         <!-- Line items card -->
         <div class="card" style="margin-bottom:16px">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
             <h3 style="margin:0;font-size:14px;font-weight:600">Items Received</h3>
-            <button class="btn btn-secondary" onclick="addReceivingLine()" style="font-size:12px;padding:5px 12px">+ Add Item</button>
+          </div>
+          <!-- Quick-add search bar -->
+          <div class="recv-quick-bar" style="margin-bottom:10px">
+            <div style="position:relative;flex:1;max-width:380px">
+              <input class="form-control" id="recv-quick-search" placeholder="🔍 Type product name to add…" oninput="filterRecvQuick()" onkeydown="recvQuickKeydown(event)" autocomplete="off" style="font-size:13px">
+              <div id="recv-quick-results" style="display:none;position:absolute;z-index:400;left:0;right:0;top:100%;background:#fff;border:1px solid var(--gray200);border-radius:var(--radius);box-shadow:0 4px 16px rgba(0,0,0,.12);max-height:220px;overflow-y:auto;margin-top:2px"></div>
+            </div>
+            <span style="font-size:12px;color:var(--gray400)">↵ Enter to add • Edit details in table</span>
           </div>
           <div style="overflow-x:auto">
             <table class="recv-lines-table">
@@ -1761,6 +1824,67 @@ th.sort-asc .sort-icon,th.sort-desc .sort-icon{opacity:1;color:var(--green)}
   </div>
 </div>
 
+<!-- Supplier Payment Modal -->
+<div class="modal-overlay hidden" id="sup-payment-modal-overlay">
+  <div class="modal modal-sm">
+    <div class="modal-header">
+      <h3>Record Supplier Payment</h3>
+      <button class="modal-close" onclick="closeModal('sup-payment-modal-overlay')">✕</button>
+    </div>
+    <div class="modal-body" style="display:flex;flex-direction:column;gap:12px">
+      <input type="hidden" id="sup-pay-supplier-id">
+      <div class="form-group">
+        <label>Supplier</label>
+        <input class="form-control" id="sup-pay-supplier-name" readonly style="background:var(--gray50)">
+      </div>
+      <div class="form-group">
+        <label>Amount (KES)</label>
+        <input class="form-control" type="number" min="1" step="0.01" id="sup-pay-amount" placeholder="0.00">
+      </div>
+      <div class="form-group">
+        <label>Payment Date</label>
+        <input class="form-control" type="date" id="sup-pay-date">
+      </div>
+      <div class="form-group">
+        <label>Payment Method</label>
+        <select class="form-control" id="sup-pay-method">
+          <option value="bank_transfer">Bank Transfer</option>
+          <option value="mpesa">M-Pesa</option>
+          <option value="cash">Cash</option>
+          <option value="cheque">Cheque</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Reference / Note</label>
+        <input class="form-control" id="sup-pay-ref" placeholder="e.g. TXN ref, cheque no.">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('sup-payment-modal-overlay')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveSupplierPayment()">Record Payment</button>
+    </div>
+  </div>
+</div>
+
+<!-- Supplier Statement Modal -->
+<div class="modal-overlay hidden" id="sup-stmt-modal-overlay">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <h3 id="sup-stmt-title">Supplier Statement</h3>
+      <button class="modal-close" onclick="closeModal('sup-stmt-modal-overlay')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="sup-stmt-summary" style="display:flex;gap:16px;margin-bottom:16px;flex-wrap:wrap"></div>
+      <div style="font-size:12px;font-weight:600;color:var(--gray600);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">Transaction History</div>
+      <div id="sup-stmt-list" style="max-height:380px;overflow-y:auto"></div>
+    </div>
+    <div class="modal-footer">
+      <div id="sup-stmt-balance" style="font-size:14px;font-weight:700;color:var(--gray800)"></div>
+      <button class="btn btn-secondary" onclick="closeModal('sup-stmt-modal-overlay')">Close</button>
+    </div>
+  </div>
+</div>
+
 <!-- Return / Refund Modal -->
 <div class="modal-overlay hidden" id="return-modal-overlay">
   <div class="modal modal-lg">
@@ -2069,7 +2193,7 @@ th.sort-asc .sort-icon,th.sort-desc .sort-icon{opacity:1;color:var(--green)}
    CORE DATA STORE
 ════════════════════════════════════════════════ */
 /* Tables synced to Supabase */
-const SB_TABLES=new Set(['users','products','sales','customers','payments','returns','suppliers','inv_history','quotes','campaigns','held_sales']);
+const SB_TABLES=new Set(['users','products','sales','customers','payments','returns','suppliers','inv_history','quotes','campaigns','held_sales','held_receivings','supplier_payments','receipts']);
 
 const DB = {
   get(k){try{return JSON.parse(localStorage.getItem('npos_'+k))||null}catch{return null}},
@@ -2497,9 +2621,9 @@ function initApp(){
   navigate(startPage);
   startClock();
   loadSettings();
-  checkOverdueAlerts();
-  checkMarketingBanner();
+  refreshNotifications();
   startAutoBackupScheduler();
+  setInterval(refreshNotifications, 60000); // refresh badge every minute
 }
 
 // ── Daily 5 PM auto-backup ──────────────────────────────
@@ -3541,15 +3665,151 @@ function renderReceiving(){
   if(!document.getElementById('recv-date').value){
     document.getElementById('recv-date').value=new Date().toISOString().slice(0,10);
   }
+  // Render held receivings
+  renderHeldReceivings();
   // Render lines
-  if(recvLines.length===0) addReceivingLine();
-  else renderRecvLines();
+  if(recvLines.length===0) recvLines.push({productId:'',qty:1,unitCost:'',batchNo:'',expiry:''});
+  renderRecvLines();
   renderReceiptHistory();
 }
 
 function addReceivingLine(){
-  recvLines.unshift({productId:'',qty:1,unitCost:'',batchNo:'',expiry:''});
+  recvLines.push({productId:'',qty:1,unitCost:'',batchNo:'',expiry:''});
   renderRecvLines();
+}
+
+/* ── Hold / Resume Receiving ── */
+function holdReceiving(){
+  const invoiceNo=document.getElementById('recv-invoice-no').value.trim();
+  const supplierId=document.getElementById('recv-supplier').value;
+  const date=document.getElementById('recv-date').value;
+  const notes=document.getElementById('recv-notes').value.trim();
+  const filledLines=recvLines.filter(ln=>ln.productId||ln.unitCost);
+  if(!filledLines.length&&!invoiceNo){toast('Nothing to hold — form is empty','warning');return;}
+  const held={
+    id:uid(),
+    invoiceNo:invoiceNo||'(no invoice)',
+    supplierId,
+    supplierName:(DB.all('suppliers').find(s=>s.id===supplierId)||{}).name||'—',
+    date,notes,
+    lines:JSON.parse(JSON.stringify(recvLines)),
+    heldAt:now(),
+    heldBy:currentUser.name
+  };
+  DB.push('held_receivings',held);
+  // Clear form
+  recvLines=[{productId:'',qty:1,unitCost:'',batchNo:'',expiry:''}];
+  document.getElementById('recv-invoice-no').value='';
+  document.getElementById('recv-supplier').value='';
+  document.getElementById('recv-notes').value='';
+  document.getElementById('recv-date').value=new Date().toISOString().slice(0,10);
+  renderRecvLines();
+  renderHeldReceivings();
+  toast(`Receiving held — "${held.invoiceNo}"`,'success');
+}
+
+function resumeHeldReceiving(id){
+  const held=DB.all('held_receivings').find(h=>h.id===id);
+  if(!held) return;
+  // If current form has data, warn
+  const hasData=recvLines.some(ln=>ln.productId)||document.getElementById('recv-invoice-no').value.trim();
+  const doResume=()=>{
+    recvLines=JSON.parse(JSON.stringify(held.lines));
+    document.getElementById('recv-invoice-no').value=held.invoiceNo==='(no invoice)'?'':held.invoiceNo;
+    document.getElementById('recv-supplier').value=held.supplierId||'';
+    document.getElementById('recv-date').value=held.date||new Date().toISOString().slice(0,10);
+    document.getElementById('recv-notes').value=held.notes||'';
+    renderRecvLines();
+    DB.remove('held_receivings',id);
+    renderHeldReceivings();
+    toast('Receiving resumed');
+  };
+  if(hasData){
+    showConfirm('Resume Held Receiving','This will replace the current form contents. Continue?',doResume);
+  }else{
+    doResume();
+  }
+}
+
+function deleteHeldReceiving(id){
+  const held=DB.all('held_receivings').find(h=>h.id===id);
+  showConfirm('Delete Held Receiving',`Delete held receiving "${held?.invoiceNo}"?`,()=>{
+    DB.remove('held_receivings',id);
+    renderHeldReceivings();
+    toast('Held receiving deleted');
+  });
+}
+
+function renderHeldReceivings(){
+  const section=document.getElementById('held-recv-section');
+  const list=document.getElementById('held-recv-list');
+  if(!section||!list) return;
+  const held=DB.all('held_receivings')||[];
+  if(!held.length){section.style.display='none';return;}
+  section.style.display='block';
+  list.innerHTML=held.map(h=>{
+    const ts=new Date(h.heldAt).toLocaleString('en-KE',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
+    const lineCount=h.lines.filter(ln=>ln.productId).length;
+    return `<div class="held-recv-card">
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:600;font-size:13px">${h.invoiceNo} <span style="color:var(--gray400);font-weight:400">— ${h.supplierName}</span></div>
+        <div style="font-size:11px;color:var(--gray500);margin-top:2px">${ts} · ${lineCount} item${lineCount!==1?'s':''} · Held by ${h.heldBy}</div>
+      </div>
+      <button class="btn btn-secondary btn-sm" onclick="resumeHeldReceiving('${h.id}')">▶ Resume</button>
+      <button class="btn btn-danger btn-sm" onclick="deleteHeldReceiving('${h.id}')" style="padding:4px 8px">✕</button>
+    </div>`;
+  }).join('');
+}
+
+/* ── Quick-add search bar ── */
+function filterRecvQuick(){
+  const inp=document.getElementById('recv-quick-search');
+  const res=document.getElementById('recv-quick-results');
+  if(!inp||!res) return;
+  const val=inp.value.toLowerCase().trim();
+  if(!val){res.style.display='none';return;}
+  const matches=DB.all('products').filter(p=>
+    p.name.toLowerCase().includes(val)||((p.sku||'').toLowerCase().includes(val))
+  ).sort((a,b)=>a.name.localeCompare(b.name)).slice(0,12);
+  if(!matches.length){res.style.display='none';return;}
+  res.innerHTML=matches.map((p,i)=>`
+    <div id="recv-quick-opt-${i}" onmousedown="recvQuickSelect('${p.id}')"
+      style="padding:9px 12px;cursor:pointer;font-size:13px;border-bottom:1px solid var(--gray100)"
+      onmouseover="this.style.background='var(--gray50)'" onmouseout="this.style.background=''">
+      ${p.name}${p.sku?`<span style="color:var(--gray400);font-size:11px;margin-left:6px">${p.sku}</span>`:''}
+      <span style="float:right;color:var(--gray400);font-size:11px">Stock: ${p.stock}</span>
+    </div>`).join('');
+  res.style.display='block';
+}
+
+function recvQuickKeydown(e){
+  if(e.key==='Enter'){
+    const res=document.getElementById('recv-quick-results');
+    const first=res?.querySelector('[id^="recv-quick-opt-"]');
+    if(first) first.dispatchEvent(new MouseEvent('mousedown'));
+  }
+  if(e.key==='Escape'){
+    const res=document.getElementById('recv-quick-results');
+    if(res) res.style.display='none';
+  }
+}
+
+function recvQuickSelect(productId){
+  const p=DB.all('products').find(x=>x.id===productId);
+  if(!p) return;
+  // Check if already in list
+  const existing=recvLines.find(ln=>ln.productId===productId);
+  if(existing){
+    existing.qty=(parseInt(existing.qty)||0)+1;
+  }else{
+    recvLines.push({productId,qty:1,unitCost:p.buyPrice||'',batchNo:'',expiry:''});
+  }
+  renderRecvLines();
+  const inp=document.getElementById('recv-quick-search');
+  const res=document.getElementById('recv-quick-results');
+  if(inp){inp.value='';inp.focus();}
+  if(res) res.style.display='none';
+  toast(`Added: ${p.name}`,'success');
 }
 
 function removeReceivingLine(idx){
@@ -3676,6 +3936,22 @@ function postReceipt(){
   });
 
   toast(`Receipt posted — ${items.length} item(s), KES ${total.toLocaleString('en-KE',{minimumFractionDigits:2})}`,'success');
+
+  // Track as supplier payable
+  if(supplierId&&total>0){
+    DB.push('supplier_payments',{
+      id:uid(),supplierId,
+      supplierName:supplier?supplier.name:'Unknown',
+      type:'invoice',
+      amount:total,
+      date:recvDate,
+      reference:invoiceNo,
+      note:'Invoice received',
+      recordedBy:currentUser.name,
+      recordedAt:ts
+    });
+    renderSupplierAccounts();
+  }
 
   // Reset form
   recvLines=[{productId:'',qty:1,unitCost:'',batchNo:'',expiry:''}];
@@ -4762,16 +5038,7 @@ function isOverdue(c){
   return daysSince>c.creditDays;
 }
 
-function checkOverdueAlerts(){
-  if(!ROLE_ACCESS[currentUser?.role]?.includes('customers')) return;
-  const customers=DB.all('customers');
-  const overdue=customers.filter(c=>isOverdue(c));
-  const banner=document.getElementById('overdue-banner');
-  if(!overdue.length){banner.classList.add('hidden');return;}
-  document.getElementById('ob-title').textContent=`${overdue.length} Overdue Account${overdue.length>1?'s':''}`;
-  document.getElementById('ob-body').textContent=overdue.map(c=>`${c.name} (${kes(c.balance)})`).join(' · ');
-  banner.classList.remove('hidden');
-}
+function checkOverdueAlerts(){ refreshNotifications(); }
 
 /* ════════════════════════════════════════════════
    CUSTOMER ACCOUNTS
@@ -5194,6 +5461,7 @@ function renderSuppliers(){
       ${currentUser.role==='admin'?`<button class="btn btn-danger btn-sm" onclick="confirmDeleteSupplier('${s.id}')">Del</button>`:''}
     </div></td>
   </tr>`).join('');
+  renderSupplierAccounts();
 }
 
 function openSupplierModal(id){
@@ -5229,6 +5497,127 @@ function confirmDeleteSupplier(id){
     toast('Supplier deleted');
     renderSuppliers();
   });
+}
+
+/* ── Supplier Accounts ── */
+function renderSupplierAccounts(){
+  const tbody=document.getElementById('sup-acc-tbody');
+  if(!tbody) return;
+  const suppliers=DB.all('suppliers');
+  if(!suppliers.length){
+    tbody.innerHTML='<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--gray400)">No suppliers added yet</td></tr>';
+    return;
+  }
+  const allPayments=DB.all('supplier_payments')||[];
+  tbody.innerHTML=suppliers.map(s=>{
+    const txns=allPayments.filter(p=>p.supplierId===s.id);
+    const totalInvoiced=txns.filter(t=>t.type==='invoice').reduce((a,t)=>a+t.amount,0);
+    const totalPaid=txns.filter(t=>t.type==='payment').reduce((a,t)=>a+t.amount,0);
+    const balance=totalInvoiced-totalPaid;
+    const agingChip=_agingChip(txns,s.terms||30);
+    return`<tr>
+      <td><strong>${s.name}</strong></td>
+      <td>${kes(totalInvoiced)}</td>
+      <td style="color:var(--green)">${kes(totalPaid)}</td>
+      <td style="font-weight:700;color:${balance>0?'var(--red)':'var(--green)'}">${kes(balance)}</td>
+      <td>${agingChip}</td>
+      <td>
+        <div style="display:flex;gap:6px">
+          <button class="btn btn-secondary btn-sm" onclick="openSupplierPaymentModal('${s.id}')">💳 Pay</button>
+          <button class="btn btn-secondary btn-sm" onclick="openSupplierStatement('${s.id}')">📄 Statement</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function _agingChip(txns,terms){
+  // Find oldest unpaid invoice
+  const invoices=txns.filter(t=>t.type==='invoice').sort((a,b)=>a.date.localeCompare(b.date));
+  if(!invoices.length) return `<span class="aging-chip aging-current">No invoices</span>`;
+  const oldest=invoices[0];
+  const days=Math.floor((Date.now()-new Date(oldest.date))/(86400000));
+  if(days<=terms) return `<span class="aging-chip aging-current">Current (${days}d)</span>`;
+  if(days<=30+terms) return `<span class="aging-chip aging-30">${days}d overdue</span>`;
+  if(days<=60+terms) return `<span class="aging-chip aging-60">${days}d overdue</span>`;
+  return `<span class="aging-chip aging-90">${days}d overdue</span>`;
+}
+
+function openSupplierPaymentModal(supplierId){
+  const s=DB.all('suppliers').find(x=>x.id===supplierId);
+  if(!s) return;
+  document.getElementById('sup-pay-supplier-id').value=supplierId;
+  document.getElementById('sup-pay-supplier-name').value=s.name;
+  document.getElementById('sup-pay-amount').value='';
+  document.getElementById('sup-pay-date').value=new Date().toISOString().slice(0,10);
+  document.getElementById('sup-pay-ref').value='';
+  openModal('sup-payment-modal-overlay');
+}
+
+function saveSupplierPayment(){
+  const supplierId=document.getElementById('sup-pay-supplier-id').value;
+  const amount=parseFloat(document.getElementById('sup-pay-amount').value)||0;
+  const date=document.getElementById('sup-pay-date').value;
+  const method=document.getElementById('sup-pay-method').value;
+  const ref=document.getElementById('sup-pay-ref').value.trim();
+  if(!supplierId){toast('No supplier selected','error');return;}
+  if(amount<=0){toast('Enter a valid amount','error');return;}
+  if(!date){toast('Select a date','error');return;}
+  const s=DB.all('suppliers').find(x=>x.id===supplierId);
+  DB.push('supplier_payments',{
+    id:uid(),supplierId,
+    supplierName:s?s.name:'Unknown',
+    type:'payment',
+    amount,date,method,
+    reference:ref,
+    note:`${method.replace('_',' ')} payment`,
+    recordedBy:currentUser.name,
+    recordedAt:now()
+  });
+  toast(`Payment of ${kes(amount)} recorded for ${s?.name}`,'success');
+  closeModal('sup-payment-modal-overlay');
+  renderSupplierAccounts();
+}
+
+function openSupplierStatement(supplierId){
+  const s=DB.all('suppliers').find(x=>x.id===supplierId);
+  if(!s) return;
+  document.getElementById('sup-stmt-title').textContent=`Statement — ${s.name}`;
+  const allPayments=DB.all('supplier_payments')||[];
+  const txns=allPayments.filter(p=>p.supplierId===supplierId).sort((a,b)=>a.date.localeCompare(b.date));
+  const totalInvoiced=txns.filter(t=>t.type==='invoice').reduce((a,t)=>a+t.amount,0);
+  const totalPaid=txns.filter(t=>t.type==='payment').reduce((a,t)=>a+t.amount,0);
+  const balance=totalInvoiced-totalPaid;
+
+  // Summary chips
+  document.getElementById('sup-stmt-summary').innerHTML=`
+    <div class="stat-card" style="min-width:120px"><div class="stat-value">${kes(totalInvoiced)}</div><div class="stat-label">Total Invoiced</div></div>
+    <div class="stat-card" style="min-width:120px"><div class="stat-value" style="color:var(--green)">${kes(totalPaid)}</div><div class="stat-label">Total Paid</div></div>
+    <div class="stat-card" style="min-width:120px"><div class="stat-value" style="color:${balance>0?'var(--red)':'var(--green)'}">${kes(Math.abs(balance))}</div><div class="stat-label">${balance>0?'Balance Owed':'Credit'}</div></div>`;
+
+  document.getElementById('sup-stmt-balance').textContent=balance>0?`Balance Owed: ${kes(balance)}`:'✅ Fully Paid';
+
+  if(!txns.length){
+    document.getElementById('sup-stmt-list').innerHTML='<div style="padding:20px;text-align:center;color:var(--gray400)">No transactions yet</div>';
+  }else{
+    let running=0;
+    document.getElementById('sup-stmt-list').innerHTML=txns.map(t=>{
+      if(t.type==='invoice') running+=t.amount;
+      else running-=t.amount;
+      const isInvoice=t.type==='invoice';
+      const ts=fmtDate(t.date);
+      return`<div class="stmt-row">
+        <div style="min-width:80px;color:var(--gray500);font-size:12px">${ts}</div>
+        <div style="flex:1">
+          <div style="font-weight:500">${isInvoice?'📦 Invoice received':'💳 Payment made'}</div>
+          <div style="font-size:11px;color:var(--gray400)">${t.reference||''}${t.reference&&t.note?' · ':''}${t.note||''}</div>
+        </div>
+        <div class="${isInvoice?'stmt-debit':'stmt-credit'}" style="min-width:100px;text-align:right">${isInvoice?'+':'-'}${kes(t.amount)}</div>
+        <div style="min-width:100px;text-align:right;color:${running>0?'var(--red)':'var(--green)'};font-weight:600">${kes(running)}</div>
+      </div>`;
+    }).join('');
+  }
+  openModal('sup-stmt-modal-overlay');
 }
 
 /* ════════════════════════════════════════════════
@@ -6483,18 +6872,134 @@ function deleteCampaign(){
   checkMarketingBanner();
 }
 
-/* ── Marketing banner (all pages) ── */
-function checkMarketingBanner(){
-  const today=new Date().toISOString().split('T')[0];
-  const campaigns=DB.all('campaigns')||[];
-  const active=campaigns.filter(c=>c.startDate<=today&&c.endDate>=today);
-  const banner=document.getElementById('marketing-banner');
-  if(!banner) return;
-  if(!active.length){banner.classList.add('hidden');return;}
-  const names=active.map(c=>`${c.name}${c.discount?` (${c.discount}% off)`:''}`).join(' · ');
-  document.getElementById('mb-text').textContent=names;
-  banner.classList.remove('hidden');
+/* ── Marketing banner (legacy stub — replaced by bell notifications) ── */
+function checkMarketingBanner(){ refreshNotifications(); }
+
+/* ════════════════════════════════════════════════
+   NOTIFICATION BELL SYSTEM
+════════════════════════════════════════════════ */
+const NOTIF_DISMISSED_KEY='npos_notif_dismissed';
+
+function _getDismissed(){
+  try{return JSON.parse(localStorage.getItem(NOTIF_DISMISSED_KEY))||[];}catch{return[];}
 }
+function _setDismissed(arr){localStorage.setItem(NOTIF_DISMISSED_KEY,JSON.stringify(arr));}
+
+function _buildNotifications(){
+  const today=new Date().toISOString().slice(0,10);
+  const notifs=[];
+
+  // Overdue customer accounts
+  if(ROLE_ACCESS[currentUser?.role]?.includes('customers')){
+    const overdue=(DB.all('customers')||[]).filter(c=>isOverdue(c));
+    if(overdue.length){
+      notifs.push({
+        id:'overdue_customers',
+        icon:'⚠️',
+        title:`${overdue.length} Overdue Account${overdue.length>1?'s':''}`,
+        body:overdue.slice(0,3).map(c=>c.name).join(', ')+(overdue.length>3?`, +${overdue.length-3} more`:''),
+        action:()=>navigate('customers'),
+        persistent:true
+      });
+    }
+  }
+
+  // Active campaigns
+  const activeCampaigns=(DB.all('campaigns')||[]).filter(c=>c.startDate<=today&&c.endDate>=today);
+  if(activeCampaigns.length){
+    notifs.push({
+      id:'active_campaigns',
+      icon:'🎯',
+      title:`${activeCampaigns.length} Active Campaign${activeCampaigns.length>1?'s':''}`,
+      body:activeCampaigns.map(c=>`${c.name}${c.discount?` (${c.discount}% off)`:''}`).join(' · '),
+      action:()=>navigate('marketing'),
+      persistent:false
+    });
+  }
+
+  // Low stock (below reorder level or ≤5)
+  if(ROLE_ACCESS[currentUser?.role]?.includes('inventory')){
+    const lowStock=(DB.all('products')||[]).filter(p=>!p.deleted&&p.stock<=5&&p.stock>=0);
+    if(lowStock.length){
+      notifs.push({
+        id:'low_stock',
+        icon:'📦',
+        title:`${lowStock.length} Item${lowStock.length>1?'s':''} Low on Stock`,
+        body:lowStock.slice(0,3).map(p=>p.name).join(', ')+(lowStock.length>3?`, +${lowStock.length-3} more`:''),
+        action:()=>navigate('inventory'),
+        persistent:false
+      });
+    }
+  }
+
+  return notifs;
+}
+
+function refreshNotifications(){
+  const notifs=_buildNotifications();
+  const dismissed=_getDismissed();
+  // Persistent notifications (overdue) are never dismissed
+  const visible=notifs.filter(n=>n.persistent||!dismissed.includes(n.id));
+  const badge=document.getElementById('notif-badge');
+  const list=document.getElementById('notif-list');
+  if(!badge||!list) return;
+  if(visible.length===0){
+    badge.classList.add('hidden');
+    list.innerHTML='<div class="notif-empty">No notifications</div>';
+  }else{
+    badge.textContent=visible.length;
+    badge.classList.remove('hidden');
+    list.innerHTML=visible.map(n=>`
+      <div class="notif-item" onclick="handleNotifClick('${n.id}')">
+        <div class="notif-icon">${n.icon}</div>
+        <div class="notif-content">
+          <div class="notif-title">${n.title}</div>
+          <div class="notif-body">${n.body}</div>
+        </div>
+        ${!n.persistent?`<button onclick="event.stopPropagation();dismissNotif('${n.id}')" style="background:none;border:none;color:var(--gray400);cursor:pointer;font-size:14px;padding:2px 4px;flex-shrink:0">✕</button>`:''}
+      </div>`).join('');
+  }
+}
+
+function handleNotifClick(id){
+  const notifs=_buildNotifications();
+  const n=notifs.find(x=>x.id===id);
+  closeNotifDropdown();
+  if(n?.action) n.action();
+}
+
+function dismissNotif(id){
+  const d=_getDismissed();
+  if(!d.includes(id)) d.push(id);
+  _setDismissed(d);
+  refreshNotifications();
+}
+
+function dismissAllNotifs(){
+  const notifs=_buildNotifications();
+  const d=_getDismissed();
+  notifs.filter(n=>!n.persistent).forEach(n=>{if(!d.includes(n.id))d.push(n.id);});
+  _setDismissed(d);
+  refreshNotifications();
+}
+
+function toggleNotifDropdown(){
+  const dd=document.getElementById('notif-dropdown');
+  if(!dd) return;
+  dd.classList.toggle('hidden');
+  if(!dd.classList.contains('hidden')) refreshNotifications();
+}
+
+function closeNotifDropdown(){
+  const dd=document.getElementById('notif-dropdown');
+  if(dd) dd.classList.add('hidden');
+}
+
+// Close on outside click
+document.addEventListener('click',e=>{
+  const wrapper=document.getElementById('notif-bell-btn')?.closest('.notif-wrapper');
+  if(wrapper&&!wrapper.contains(e.target)) closeNotifDropdown();
+});
 
 /* ════════════════════════════════════════════════
    BOOT
