@@ -92,12 +92,57 @@ tr:hover td{background:var(--gray50)}
 .table-actions{display:flex;gap:4px}
 
 /* ── LOGIN ── */
-#login-screen{position:fixed;inset:0;background:linear-gradient(135deg,#064e3b 0%,#065f46 50%,#047857 100%);display:flex;align-items:center;justify-content:center;z-index:1000}
-.login-box{background:var(--white);border-radius:16px;box-shadow:var(--shadow-lg);padding:40px;width:100%;max-width:400px;margin:16px}
-.login-logo{text-align:center;margin-bottom:32px}
-.login-logo h1{font-size:28px;font-weight:700;color:var(--green);letter-spacing:-0.5px}
-.login-logo p{color:var(--gray500);font-size:13px;margin-top:4px}
-.login-error{background:var(--red-light);color:var(--red);padding:10px 14px;border-radius:var(--radius);font-size:13px;margin-bottom:16px}
+#login-screen{position:fixed;inset:0;background:linear-gradient(135deg,#064e3b 0%,#065f46 50%,#047857 100%);display:flex;align-items:center;justify-content:center;z-index:1000;overflow:hidden}
+.login-box{background:var(--white);border-radius:20px;box-shadow:0 24px 60px rgba(0,0,0,.25);padding:36px 40px 40px;width:100%;max-width:400px;margin:16px;opacity:0;animation:loginBoxIn .65s cubic-bezier(.22,.68,0,1.15) .1s forwards}
+.login-error{background:var(--red-light);color:var(--red);padding:10px 14px;border-radius:var(--radius);font-size:13px;margin-bottom:4px}
+
+/* Floating background bubbles */
+.login-bg{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.login-bg i{position:absolute;bottom:-30px;border-radius:50%;background:rgba(255,255,255,.07);animation:bubbleRise linear infinite}
+.login-bg i:nth-child(1){left:8%;width:18px;height:18px;animation-duration:9s;animation-delay:0s}
+.login-bg i:nth-child(2){left:22%;width:10px;height:10px;animation-duration:7s;animation-delay:1.2s}
+.login-bg i:nth-child(3){left:38%;width:28px;height:28px;animation-duration:11s;animation-delay:.5s}
+.login-bg i:nth-child(4){left:52%;width:14px;height:14px;animation-duration:8s;animation-delay:2s}
+.login-bg i:nth-child(5){left:68%;width:22px;height:22px;animation-duration:10s;animation-delay:.8s}
+.login-bg i:nth-child(6){left:82%;width:12px;height:12px;animation-duration:6s;animation-delay:3s}
+.login-bg i:nth-child(7){left:15%;width:20px;height:20px;animation-duration:12s;animation-delay:4s}
+.login-bg i:nth-child(8){left:72%;width:16px;height:16px;animation-duration:8.5s;animation-delay:1.8s}
+@keyframes bubbleRise{0%{opacity:0;transform:translateY(0) scale(.4)}10%{opacity:.8}90%{opacity:.3}100%{opacity:0;transform:translateY(-110vh) scale(1)}}
+
+/* Mascot */
+.mascot-area{text-align:center;margin-bottom:16px;position:relative;min-height:100px}
+.mascot-row{display:flex;align-items:flex-end;justify-content:center;gap:0;line-height:1}
+.mascot-emo{font-size:66px;display:inline-block;animation:mascotBob 2.8s ease-in-out infinite;cursor:default;user-select:none;transition:filter .2s}
+.mascot-tool{font-size:24px;display:inline-block;margin-left:-6px;margin-bottom:4px;animation:toolSway 2.8s ease-in-out infinite;cursor:default;user-select:none;transition:opacity .3s}
+.mascot-bubble{display:inline-block;background:rgba(22,163,74,.12);color:#065f46;border-radius:20px;padding:5px 16px;font-size:12px;font-weight:600;margin-top:10px;transition:background .3s,color .3s;line-height:1.4}
+.mascot-bubble.err{background:var(--red-light);color:var(--red)}
+.mascot-bubble.ok{background:var(--green-light);color:var(--green-dark)}
+.mascot-bubble.wait{background:var(--amber-light);color:var(--amber)}
+
+@keyframes mascotBob{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-10px) rotate(2deg)}}
+@keyframes toolSway{0%,100%{transform:rotate(-8deg)}50%{transform:rotate(8deg)}}
+@keyframes loginBoxIn{from{opacity:0;transform:translateY(40px) scale(.93)}to{opacity:1;transform:translateY(0) scale(1)}}
+
+/* Wrong password */
+.login-box.shake{animation:loginShake .45s cubic-bezier(.36,.07,.19,.97) both!important}
+@keyframes loginShake{
+  0%,100%{transform:translateX(0)}12%{transform:translateX(-10px) rotate(-1deg)}
+  25%{transform:translateX(10px) rotate(1deg)}37%{transform:translateX(-7px)}
+  50%{transform:translateX(7px)}62%{transform:translateX(-4px)}
+  75%{transform:translateX(4px)}87%{transform:translateX(-2px)}
+}
+.login-error{animation:errPop .3s cubic-bezier(.34,1.56,.64,1) both}
+@keyframes errPop{from{opacity:0;transform:translateY(-6px) scale(.96)}to{opacity:1;transform:translateY(0) scale(1)}}
+
+/* Success */
+.mascot-emo.jump{animation:mascotJump .55s cubic-bezier(.22,.68,0,1.4)!important}
+@keyframes mascotJump{0%{transform:translateY(0) scale(1) rotate(0)}40%{transform:translateY(-22px) scale(1.2) rotate(10deg)}100%{transform:translateY(0) scale(1) rotate(0)}}
+.sparkle-el{position:absolute;pointer-events:none;animation:sparklePop .7s ease forwards}
+@keyframes sparklePop{0%{opacity:0;transform:scale(0) rotate(0)}40%{opacity:1;transform:scale(1.4) rotate(-15deg)}100%{opacity:0;transform:scale(0) translateY(-28px) rotate(25deg)}}
+.login-box.bye{animation:boxBye .5s ease forwards!important}
+@keyframes boxBye{to{opacity:0;transform:scale(1.05)}}
+#login-screen.bye{animation:screenBye .5s ease forwards}
+@keyframes screenBye{to{opacity:0}}
 
 /* ── APP LAYOUT ── */
 #app{display:none;height:100vh;overflow:hidden}
@@ -560,11 +605,24 @@ th.sort-asc .sort-icon,th.sort-desc .sort-icon{opacity:1;color:var(--green)}
      LOGIN SCREEN
 ══════════════════════════════════════════════ -->
 <div id="login-screen">
-  <div class="login-box">
-    <div class="login-logo">
-      <h1>🛍 NairobiPOS</h1>
-      <p>Retail Management System · Nairobi, Kenya</p>
+  <!-- Floating background bubbles -->
+  <div class="login-bg"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+
+  <div class="login-box" id="login-box">
+    <!-- Doctor bear mascot -->
+    <div class="mascot-area" id="mascot-area">
+      <div class="mascot-row">
+        <span class="mascot-emo" id="mascot-emo">🐻</span><span class="mascot-tool" id="mascot-tool">🩺</span>
+      </div>
+      <div><span class="mascot-bubble" id="mascot-bubble">Welcome back! 👋</span></div>
     </div>
+
+    <!-- App title -->
+    <div style="text-align:center;margin-bottom:20px">
+      <div style="font-size:22px;font-weight:700;color:var(--green);letter-spacing:-.3px">NairobiPOS</div>
+      <div style="color:var(--gray500);font-size:12px;margin-top:3px">Retail Management · Nairobi, Kenya</div>
+    </div>
+
     <div id="login-error" class="login-error hidden"></div>
     <form id="login-form" style="display:flex;flex-direction:column;gap:16px">
       <div class="form-group">
@@ -575,7 +633,7 @@ th.sort-asc .sort-icon,th.sort-desc .sort-icon{opacity:1;color:var(--green)}
         <label>Password</label>
         <input class="form-control" id="login-password" type="password" placeholder="Enter password" autocomplete="current-password" required>
       </div>
-      <button type="submit" class="btn btn-primary btn-lg w-full" style="margin-top:4px">Sign In</button>
+      <button type="submit" class="btn btn-primary btn-lg w-full" id="login-btn" style="margin-top:4px">Sign In</button>
     </form>
   </div>
 </div>
@@ -2591,32 +2649,116 @@ const ROLE_ACCESS={
   stock:['inventory','inv-history','suppliers','receiving','marketing','leaderboard']
 };
 
-document.getElementById('login-form').addEventListener('submit',e=>{
+document.getElementById('login-form').addEventListener('submit',async e=>{
   e.preventDefault();
   const uname=document.getElementById('login-username').value.trim();
   const pass=document.getElementById('login-password').value;
-  const users=DB.all('users');
-  const user=users.find(u=>u.username===uname&&u.password===pass&&u.active);
+
+  // Try local first (fast path)
+  let users=DB.all('users');
+  let user=users.find(u=>u.username===uname&&u.password===pass&&u.active);
+
+  // If not found locally and online, fetch latest users from Supabase and retry.
+  if(!user&&navigator.onLine){
+    _mascot('🤔','Checking credentials…','wait',false);
+    document.getElementById('login-btn').disabled=true;
+    try{
+      const cloudUsers=await SB.query('users',{limit:200});
+      if(cloudUsers&&cloudUsers.length>0){
+        DB.set('users',cloudUsers);
+        user=cloudUsers.find(u=>u.username===uname&&u.password===pass&&u.active);
+      }
+    }catch(_){}
+    document.getElementById('login-btn').disabled=false;
+    if(!user) _mascotReset(); // reset bear before showing error
+  }
+
   if(!user){showLoginError('Invalid username or password. Please try again.');return;}
   currentUser=user;
-  document.getElementById('login-screen').style.display='none';
-  const app=document.getElementById('app');
-  app.classList.add('visible');
-  initApp();
+  await _loginSuccess(user);
 });
 
+function _mascot(emo,bubble,bubbleCls,toolVisible){
+  const m=document.getElementById('mascot-emo');
+  const b=document.getElementById('mascot-bubble');
+  const t=document.getElementById('mascot-tool');
+  if(emo!==null){m.textContent=emo;m.style.animation=emo==='🐻'?'':'none';}
+  if(bubble!==null){b.textContent=bubble;b.className='mascot-bubble'+(bubbleCls?' '+bubbleCls:'');}
+  if(t)t.style.opacity=(toolVisible===false)?'0':'1';
+}
+function _mascotReset(){
+  _mascot('🐻','Welcome back! 👋','',true);
+  document.getElementById('mascot-emo').style.animation='';
+}
+
 function showLoginError(msg){
+  const box=document.getElementById('login-box');
+  // Shake box
+  box.classList.remove('shake');
+  void box.offsetWidth;
+  box.classList.add('shake');
+  // Sad bear
+  _mascot('🙈','Oops! Try again 😬','err',false);
+  // Show error
   const el=document.getElementById('login-error');
   el.textContent=msg;el.classList.remove('hidden');
+  // Reset after 1.8s
+  setTimeout(()=>{
+    _mascotReset();
+    box.classList.remove('shake');
+    document.getElementById('login-password').value='';
+    document.getElementById('login-password').focus();
+  },1800);
+}
+
+async function _loginSuccess(user){
+  const box=document.getElementById('login-box');
+  const mascotEl=document.getElementById('mascot-emo');
+  _mascot('🥳',`Hi, ${user.name.split(' ')[0]}! 🎉`,'ok',false);
+  document.getElementById('login-btn').disabled=true;
+  document.getElementById('login-btn').textContent='✓ Welcome!';
+  // Jump animation
+  mascotEl.classList.add('jump');
+  // Sparkles
+  const area=document.getElementById('mascot-area');
+  ['⭐','✨','🌟','💚','✨'].forEach((s,i)=>{
+    const el=document.createElement('span');
+    el.className='sparkle-el';
+    el.textContent=s;el.style.fontSize='20px';
+    el.style.left=(15+i*16)+'%';el.style.top=(5+Math.random()*25)+'%';
+    el.style.animationDelay=(i*.08)+'s';
+    area.appendChild(el);
+    setTimeout(()=>el.remove(),750);
+  });
+  await new Promise(r=>setTimeout(r,700));
+  box.classList.add('bye');
+  document.getElementById('login-screen').classList.add('bye');
+  await new Promise(r=>setTimeout(r,500));
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('login-screen').classList.remove('bye');
+  box.classList.remove('bye');
+  mascotEl.classList.remove('jump');
+  _mascotReset();
+  document.getElementById('login-btn').disabled=false;
+  document.getElementById('login-btn').textContent='Sign In';
+  document.getElementById('login-error').classList.add('hidden');
+  document.getElementById('app').classList.add('visible');
+  initApp();
 }
 
 function logout(){
   currentUser=null;
   document.getElementById('app').classList.remove('visible');
-  document.getElementById('login-screen').style.display='flex';
+  const ls=document.getElementById('login-screen');
+  ls.style.display='flex';ls.style.opacity='1';
+  // Re-trigger box entrance animation
+  const box=document.getElementById('login-box');
+  box.style.animation='none';void box.offsetWidth;
+  box.style.animation='';
   document.getElementById('login-username').value='';
   document.getElementById('login-password').value='';
   document.getElementById('login-error').classList.add('hidden');
+  _mascotReset();
 }
 
 /* ════════════════════════════════════════════════
@@ -7026,6 +7168,15 @@ document.addEventListener('click',e=>{
    BOOT
 ════════════════════════════════════════════════ */
 seedData();
+// Initialize Supabase at boot (before login) so credentials are always current.
+// Without this, Device B would check against local seed passwords and never see
+// passwords updated on Device A.
+SB.init();
+if(navigator.onLine){
+  SB.query('users',{limit:200}).then(cloudUsers=>{
+    if(cloudUsers&&cloudUsers.length>0) DB.set('users',cloudUsers);
+  }).catch(()=>{});
+}
 </script>
 </body>
 </html>
