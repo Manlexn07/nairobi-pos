@@ -187,9 +187,10 @@ tr:hover td{background:var(--gray50)}
 
 /* ── POS SCREEN ── */
 #page-pos{display:none;height:100%}
-#page-pos.active{display:flex;gap:0;height:calc(100vh - 56px)}
+#page-pos.active{display:flex;gap:0;height:100%}
+.content.pos-active{padding:0!important;overflow:hidden!important;}
 .pos-products{flex:1;display:flex;flex-direction:column;overflow:hidden;padding:16px;gap:12px}
-.pos-cart{width:340px;background:var(--white);display:flex;flex-direction:column;border-left:1px solid var(--gray200);flex-shrink:0}
+.pos-cart{width:340px;background:var(--white);display:flex;flex-direction:column;border-left:1px solid var(--gray200);flex-shrink:0;overflow:hidden}
 .pos-search{display:flex;gap:8px}
 .pos-search .form-control{flex:1}
 .pos-category-bar{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;flex-shrink:0}
@@ -206,7 +207,7 @@ tr:hover td{background:var(--gray50)}
 .product-card .prod-badge{position:absolute;top:6px;right:6px}
 /* CART */
 .cart-header{padding:14px 16px;border-bottom:1px solid var(--gray100);font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:space-between}
-.cart-items{flex:1;overflow-y:auto;padding:8px}
+.cart-items{flex:1;overflow-y:auto;padding:8px;min-height:0}
 .cart-item{display:flex;align-items:center;gap:8px;padding:8px;border-radius:var(--radius);margin-bottom:4px;transition:background .15s}
 .cart-item:hover{background:var(--gray50)}
 .cart-item-info{flex:1;min-width:0}
@@ -216,6 +217,18 @@ tr:hover td{background:var(--gray50)}
 .qty-btn{width:24px;height:24px;border-radius:6px;background:var(--gray100);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:var(--gray700);cursor:pointer;border:none}
 .qty-btn:hover{background:var(--gray200)}
 .qty-val{width:28px;text-align:center;font-weight:600;font-size:13px}
+.qty-input{width:44px;text-align:center;font-weight:600;font-size:13px;border:1.5px solid var(--gray200);border-radius:6px;padding:2px 4px;-moz-appearance:textfield;background:var(--white)}
+.qty-input::-webkit-inner-spin-button,.qty-input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+.qty-input:focus{outline:none;border-color:var(--green);box-shadow:0 0 0 2px rgba(22,163,74,.12)}
+/* Date shortcuts */
+.date-shortcuts{display:flex;gap:4px;flex-wrap:wrap;align-items:center;padding:4px 0 6px}
+.ds-btn{padding:3px 10px;border:1.5px solid var(--gray200);border-radius:20px;background:var(--white);color:var(--gray600);font-size:11px;font-weight:500;cursor:pointer;transition:all .15s;white-space:nowrap;line-height:1.6}
+.ds-btn:hover{border-color:var(--green);background:var(--green-light);color:var(--green-dark)}
+/* Sortable table headers */
+.sort-th{cursor:pointer;user-select:none;white-space:nowrap}
+.sort-th:hover{background:var(--gray50)}
+.sort-icon{opacity:.35;font-size:10px;margin-left:3px;vertical-align:middle}
+.sort-th.sorted .sort-icon{opacity:1;color:var(--green)}
 .cart-remove{color:var(--gray400);cursor:pointer;font-size:16px;padding:2px}.cart-remove:hover{color:var(--red)}
 .cart-item-price-row{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
 .cart-price-original{font-size:11px;color:var(--gray400);text-decoration:line-through}
@@ -909,6 +922,7 @@ th.sort-asc .sort-icon,th.sort-desc .sort-icon{opacity:1;color:var(--green)}
 
       <!-- ══ PAGE: INVENTORY HISTORY ══ -->
       <div id="page-inv-history" class="page">
+        <div id="hist-date-shortcuts" class="date-shortcuts"></div>
         <div class="inv-toolbar" style="margin-bottom:16px">
           <input class="form-control" id="hist-search" placeholder="Search product…" oninput="renderHistoryTable()" style="flex:1;max-width:240px">
           <select class="form-control" id="hist-type-filter" onchange="renderHistoryTable()" style="max-width:160px">
@@ -970,6 +984,7 @@ th.sort-asc .sort-icon,th.sort-desc .sort-icon{opacity:1;color:var(--green)}
 
       <!-- ══ PAGE: SALES HISTORY ══ -->
       <div id="page-sales-history" class="page">
+        <div id="sh-date-shortcuts" class="date-shortcuts"></div>
         <div class="inv-toolbar" style="margin-bottom:16px;flex-wrap:wrap">
           <input class="form-control" type="date" id="sh-date-from" onchange="renderSalesHistory()" style="max-width:150px">
           <input class="form-control" type="date" id="sh-date-to" onchange="renderSalesHistory()" style="max-width:150px">
@@ -991,7 +1006,17 @@ th.sort-asc .sort-icon,th.sort-desc .sort-icon{opacity:1;color:var(--green)}
           <div class="table-wrap">
             <table>
               <thead>
-                <tr><th>Date & Time</th><th>Receipt #</th><th>Cashier</th><th>Items</th><th>Payment</th><th>Subtotal</th><th>VAT</th><th>Total</th><th></th></tr>
+                <tr>
+                  <th class="sort-th" id="sh-th-date" onclick="shSortBy('date')">Date & Time <span class="sort-icon" id="sh-si-date">↕</span></th>
+                  <th>Receipt #</th>
+                  <th class="sort-th" id="sh-th-cashier" onclick="shSortBy('cashier')">Cashier <span class="sort-icon" id="sh-si-cashier">↕</span></th>
+                  <th>Items</th>
+                  <th>Payment</th>
+                  <th class="sort-th" id="sh-th-subtotal" onclick="shSortBy('subtotal')">Subtotal <span class="sort-icon" id="sh-si-subtotal">↕</span></th>
+                  <th class="sort-th" id="sh-th-tax" onclick="shSortBy('tax')">VAT <span class="sort-icon" id="sh-si-tax">↕</span></th>
+                  <th class="sort-th" id="sh-th-total" onclick="shSortBy('total')">Total <span class="sort-icon" id="sh-si-total">↕</span></th>
+                  <th></th>
+                </tr>
               </thead>
               <tbody id="sh-tbody"></tbody>
             </table>
@@ -1218,6 +1243,7 @@ th.sort-asc .sort-icon,th.sort-desc .sort-icon{opacity:1;color:var(--green)}
 
       <!-- ══ PAGE: RETURNS ══ -->
       <div id="page-returns" class="page">
+        <div id="ret-date-shortcuts" class="date-shortcuts"></div>
         <div class="inv-toolbar" style="margin-bottom:16px;flex-wrap:wrap">
           <input class="form-control" type="date" id="ret-date-from" onchange="renderReturns()" style="max-width:150px">
           <input class="form-control" type="date" id="ret-date-to" onchange="renderReturns()" style="max-width:150px">
@@ -2833,6 +2859,8 @@ function navigate(page){
   if(!access.includes(page)){toast('Access denied','error');return;}
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  const contentEl=document.querySelector('.content');
+  if(contentEl) contentEl.classList.toggle('pos-active', page==='pos');
   const el=document.getElementById('page-'+page);
   if(el) el.classList.add('active');
   const navEl=document.querySelector(`.nav-item[data-page="${page}"]`);
@@ -2975,6 +3003,20 @@ function updateQty(productId,delta){
 }
 
 function removeFromCart(productId){cart=cart.filter(i=>i.productId!==productId);renderCart()}
+function setCartQty(productId,val){
+  const qty=parseInt(val);
+  const item=cart.find(i=>i.productId===productId);
+  if(!item) return;
+  if(isNaN(qty)||qty<=0){removeFromCart(productId);return;}
+  if(qty>item.maxStock){toast('Max stock is '+item.maxStock,'warning');item.qty=item.maxStock;}
+  else item.qty=qty;
+  renderCart();
+}
+function shSortBy(col){
+  if(shSort.col===col) shSort.dir=shSort.dir==='asc'?'desc':'asc';
+  else{shSort.col=col;shSort.dir=col==='date'?'desc':'asc';}
+  renderSalesHistory();
+}
 
 /* ── HOLD SALE ── */
 function holdSale(){
@@ -3130,7 +3172,7 @@ function renderCart(){
       </div>
       <div class="qty-ctrl">
         <button class="qty-btn" onclick="updateQty('${i.productId}',-1)">−</button>
-        <span class="qty-val">${i.qty}</span>
+        <input class="qty-input" type="number" min="1" max="${i.maxStock}" value="${i.qty}" onclick="this.select()" onchange="setCartQty('${i.productId}',this.value)" onkeydown="if(event.key==='Enter'){this.blur();}">
         <button class="qty-btn" onclick="updateQty('${i.productId}',1)">+</button>
       </div>
       <div style="text-align:right;min-width:70px">
@@ -3747,6 +3789,8 @@ function confirmDeleteProduct(id){
    STOCK HISTORY
 ════════════════════════════════════════════════ */
 function renderHistoryTable(){
+  const dsEl=document.getElementById('hist-date-shortcuts');
+  if(dsEl&&!dsEl.dataset.built){dsEl.innerHTML=_dsHtml('hist-date-from','hist-date-to','renderHistoryTable');dsEl.dataset.built='1';}
   const q=(document.getElementById('hist-search').value||'').toLowerCase();
   const type=document.getElementById('hist-type-filter').value;
   const from=document.getElementById('hist-date-from').value;
@@ -4202,6 +4246,59 @@ function viewReceipt(id){
 ════════════════════════════════════════════════ */
 let activeReport='daily';
 let _lbMode='gross'; // 'gross' | 'profit'
+let shSort={col:'date',dir:'desc'};
+const _reportDates={profitFrom:'',profitTo:'',dailyFrom:'',dailyTo:''};
+
+/* ── Date range helpers ── */
+function _dsCalc(){
+  const t=new Date();
+  const f=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  const td=f(t);
+  const yd=new Date(t);yd.setDate(t.getDate()-1);
+  const dow=t.getDay()===0?6:t.getDay()-1;
+  const ws=new Date(t);ws.setDate(t.getDate()-dow);
+  const lwe=new Date(ws);lwe.setDate(ws.getDate()-1);
+  const lws=new Date(lwe);lws.setDate(lwe.getDate()-6);
+  const ms=new Date(t.getFullYear(),t.getMonth(),1);
+  const me=new Date(t.getFullYear(),t.getMonth()+1,0);
+  const lms=new Date(t.getFullYear(),t.getMonth()-1,1);
+  const lme=new Date(t.getFullYear(),t.getMonth(),0);
+  const d60=new Date(t);d60.setDate(t.getDate()-60);
+  const d90=new Date(t);d90.setDate(t.getDate()-90);
+  const ys=new Date(t.getFullYear(),0,1);
+  return{td,f,yd,ws,lws,lwe,ms,me,lms,lme,d60,d90,ys};
+}
+// For standalone pages with real input elements
+function _dsHtml(fromId,toId,fn){
+  const{td,f,yd,ws,lws,lwe,ms,me,lms,lme,d60,d90,ys}=_dsCalc();
+  const btns=[
+    ['Today',td,td],['Yesterday',f(yd),f(yd)],
+    ['This Week',f(ws),td],['Last Week',f(lws),f(lwe)],
+    ['This Month',f(ms),f(me)],['Last Month',f(lms),f(lme)],
+    ['Last 60 Days',f(d60),td],['Last 90 Days',f(d90),td],['This Year',f(ys),td]
+  ];
+  return btns.map(([l,a,b])=>`<button class="ds-btn" onclick="_applyDS('${fromId}','${toId}','${a}','${b}','${fn}')">${l}</button>`).join('');
+}
+function _applyDS(fromId,toId,from,to,fn){
+  const fe=document.getElementById(fromId);const te=document.getElementById(toId);
+  if(fe)fe.value=from;if(te)te.value=to;
+  if(fn&&window[fn]) window[fn]();
+}
+// For report panels that rebuild via innerHTML — uses _reportDates object
+function _rdsBtns(key){
+  const{td,f,yd,ws,lws,lwe,ms,me,lms,lme,d60,d90,ys}=_dsCalc();
+  const btns=[
+    ['Today',td,td],['Yesterday',f(yd),f(yd)],
+    ['This Week',f(ws),td],['Last Week',f(lws),f(lwe)],
+    ['This Month',f(ms),f(me)],['Last Month',f(lms),f(lme)],
+    ['Last 60 Days',f(d60),td],['Last 90 Days',f(d90),td],['This Year',f(ys),td]
+  ];
+  return btns.map(([l,a,b])=>`<button class="ds-btn" onclick="_applyRD('${key}','${a}','${b}')">${l}</button>`).join('');
+}
+function _applyRD(key,from,to){
+  _reportDates[key+'From']=from;_reportDates[key+'To']=to;
+  renderReports();
+}
 
 function switchReport(tab){
   activeReport=tab;
@@ -4514,28 +4611,51 @@ function printPaymentReceipt(payment,customer,balanceBefore){
 }
 
 function renderDailyReport(){
-  const sales=DB.all('sales');
-  // Last 7 days
+  const from=_reportDates.dailyFrom;
+  const to=_reportDates.dailyTo;
+  const allSales=DB.all('sales');
+  const todayStr=new Date().toISOString().slice(0,10);
   const days=[];
-  for(let d=6;d>=0;d--){
-    const date=new Date();date.setDate(date.getDate()-d);
-    const dateStr=date.toISOString().slice(0,10);
-    const daySales=sales.filter(s=>s.date.startsWith(dateStr));
-    days.push({dateStr,label:date.toLocaleDateString('en-KE',{weekday:'short',month:'short',day:'numeric'}),count:daySales.length,revenue:daySales.reduce((a,s)=>a+s.total,0),subtotal:daySales.reduce((a,s)=>a+s.subtotal,0),tax:daySales.reduce((a,s)=>a+s.tax,0)});
+  if(from){
+    const start=new Date(from);
+    const end=to?new Date(to):new Date();
+    for(let d=new Date(start);d<=end;d.setDate(d.getDate()+1)){
+      const dateStr=d.toISOString().slice(0,10);
+      const daySales=allSales.filter(s=>s.date.startsWith(dateStr));
+      days.push({dateStr,label:new Date(dateStr).toLocaleDateString('en-KE',{weekday:'short',month:'short',day:'numeric'}),count:daySales.length,revenue:daySales.reduce((a,s)=>a+s.total,0),subtotal:daySales.reduce((a,s)=>a+s.subtotal,0),tax:daySales.reduce((a,s)=>a+s.tax,0)});
+    }
+  } else {
+    for(let d=6;d>=0;d--){
+      const date=new Date();date.setDate(date.getDate()-d);
+      const dateStr=date.toISOString().slice(0,10);
+      const daySales=allSales.filter(s=>s.date.startsWith(dateStr));
+      days.push({dateStr,label:date.toLocaleDateString('en-KE',{weekday:'short',month:'short',day:'numeric'}),count:daySales.length,revenue:daySales.reduce((a,s)=>a+s.total,0),subtotal:daySales.reduce((a,s)=>a+s.subtotal,0),tax:daySales.reduce((a,s)=>a+s.tax,0)});
+    }
   }
-  const todaySales=sales.filter(s=>s.date.startsWith(new Date().toISOString().slice(0,10)));
+  const todaySales=allSales.filter(s=>s.date.startsWith(todayStr));
   const totalToday=todaySales.reduce((a,s)=>a+s.total,0);
-  const totalWeek=days.reduce((a,d)=>a+d.revenue,0);
+  const periodTotal=days.reduce((a,d)=>a+d.revenue,0);
+  const periodTx=days.reduce((a,d)=>a+d.count,0);
   const maxRev=Math.max(...days.map(d=>d.revenue),1);
+  const rangeLabel=from?`${from}${to?' → '+to:''}`:' Last 7 Days';
   return`
+    <div style="margin-bottom:12px">
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:4px">
+        <input class="form-control" type="date" value="${from}" style="max-width:145px" onchange="_reportDates.dailyFrom=this.value;renderReports()">
+        <span style="color:var(--gray400);font-size:12px">to</span>
+        <input class="form-control" type="date" value="${to}" style="max-width:145px" onchange="_reportDates.dailyTo=this.value;renderReports()">
+        ${from||to?`<button class="btn btn-secondary btn-sm" onclick="_reportDates.dailyFrom='';_reportDates.dailyTo='';renderReports()">Last 7 Days</button>`:''}
+      </div>
+      <div class="date-shortcuts">${_rdsBtns('daily')}</div>
+    </div>
     <div class="stat-grid">
       <div class="stat-card"><div class="stat-icon" style="background:var(--green-light)">💰</div><div class="stat-value">${kes(totalToday)}</div><div class="stat-label">Today's Revenue</div></div>
       <div class="stat-card"><div class="stat-icon" style="background:var(--blue-light)">🧾</div><div class="stat-value">${todaySales.length}</div><div class="stat-label">Today's Transactions</div></div>
-      <div class="stat-card"><div class="stat-icon" style="background:var(--amber-light)">📊</div><div class="stat-value">${kes(todaySales.length?totalToday/todaySales.length:0)}</div><div class="stat-label">Avg. Sale Value</div></div>
-      <div class="stat-card"><div class="stat-icon" style="background:var(--green-light)">📅</div><div class="stat-value">${kes(totalWeek)}</div><div class="stat-label">7-Day Revenue</div></div>
+      <div class="stat-card"><div class="stat-icon" style="background:var(--amber-light)">📊</div><div class="stat-value">${kes(periodTx?periodTotal/periodTx:0)}</div><div class="stat-label">Avg. Sale Value</div></div>
+      <div class="stat-card"><div class="stat-icon" style="background:var(--green-light)">📅</div><div class="stat-value">${kes(periodTotal)}</div><div class="stat-label">Period Revenue</div></div>
     </div>
     <div class="card">
-      <div class="card-header"><h3>Daily Revenue — Last 7 Days</h3></div>
+      <div class="card-header"><h3>Daily Revenue —${rangeLabel}</h3></div>
       <div class="card-body">
         <div class="chart-bar-wrap">
           ${days.map(d=>`
@@ -4559,7 +4679,11 @@ function renderDailyReport(){
 }
 
 function renderProfitReport(){
-  const sales=DB.all('sales');
+  const from=_reportDates.profitFrom;
+  const to=_reportDates.profitTo;
+  let sales=DB.all('sales');
+  if(from) sales=sales.filter(s=>s.date>=from);
+  if(to) sales=sales.filter(s=>s.date<=to+'T23:59:59');
   const productMap={};
   sales.forEach(s=>s.items.forEach(i=>{
     if(!productMap[i.productId]) productMap[i.productId]={name:i.productName,qty:0,revenue:0,cost:0};
@@ -4567,19 +4691,30 @@ function renderProfitReport(){
     productMap[i.productId].revenue+=i.qty*i.sellPrice;
     productMap[i.productId].cost+=i.qty*(i.buyPrice||0);
   }));
-  const rows=Object.values(productMap).map(p=>({...p,profit:p.revenue-p.cost,margin:p.cost>0?((p.revenue-p.cost)/p.revenue*100).toFixed(1):0})).sort((a,b)=>b.profit-a.profit);
+  const rows=Object.values(productMap).map(p=>({...p,profit:p.revenue-p.cost,margin:p.revenue>0?((p.revenue-p.cost)/p.revenue*100).toFixed(1):0})).sort((a,b)=>b.profit-a.profit);
   const totalRev=rows.reduce((a,r)=>a+r.revenue,0);
   const totalCost=rows.reduce((a,r)=>a+r.cost,0);
   const totalProfit=totalRev-totalCost;
+  const rangeLabel=from||to?`${from||'Start'} → ${to||'Today'}`:'All Time';
   return`
+    <div style="margin-bottom:12px">
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:4px">
+        <input class="form-control" type="date" value="${from}" style="max-width:145px" onchange="_reportDates.profitFrom=this.value;renderReports()">
+        <span style="color:var(--gray400);font-size:12px">to</span>
+        <input class="form-control" type="date" value="${to}" style="max-width:145px" onchange="_reportDates.profitTo=this.value;renderReports()">
+        ${from||to?`<button class="btn btn-secondary btn-sm" onclick="_reportDates.profitFrom='';_reportDates.profitTo='';renderReports()">All Time</button>`:''}
+        <span style="font-size:12px;color:var(--gray400);margin-left:4px">${rangeLabel}</span>
+      </div>
+      <div class="date-shortcuts">${_rdsBtns('profit')}</div>
+    </div>
     <div class="stat-grid">
       <div class="stat-card"><div class="stat-icon" style="background:var(--green-light)">💵</div><div class="stat-value">${kes(totalRev)}</div><div class="stat-label">Total Revenue</div></div>
-      <div class="stat-card"><div class="stat-icon" style="background:var(--red-light)">🏷</div><div class="stat-value">${kes(totalCost)}</div><div class="stat-label">Total Cost</div></div>
+      <div class="stat-card"><div class="stat-icon" style="background:var(--red-light)">🏷</div><div class="stat-value">${kes(totalCost)}</div><div class="stat-label">Total Cost (COGS)</div></div>
       <div class="stat-card"><div class="stat-icon" style="background:var(--green-light)">📈</div><div class="stat-value">${kes(totalProfit)}</div><div class="stat-label">Gross Profit</div></div>
       <div class="stat-card"><div class="stat-icon" style="background:var(--amber-light)">%</div><div class="stat-value">${totalRev>0?((totalProfit/totalRev)*100).toFixed(1):0}%</div><div class="stat-label">Profit Margin</div></div>
     </div>
     <div class="card">
-      <div class="card-header"><h3>Profit by Product</h3></div>
+      <div class="card-header"><h3>Profit & Consumption by Product</h3></div>
       <div class="table-wrap">
         <table>
           <thead><tr><th>Product</th><th>Units Sold</th><th>Revenue</th><th>Cost</th><th>Profit</th><th>Margin</th></tr></thead>
@@ -5428,6 +5563,10 @@ function savePayment(){
 let currentDetailSale=null;
 
 function renderSalesHistory(){
+  // Inject date shortcuts once
+  const dsEl=document.getElementById('sh-date-shortcuts');
+  if(dsEl&&!dsEl.dataset.built){dsEl.innerHTML=_dsHtml('sh-date-from','sh-date-to','renderSalesHistory');dsEl.dataset.built='1';}
+
   const from=document.getElementById('sh-date-from').value;
   const to=document.getElementById('sh-date-to').value;
   const cashierF=document.getElementById('sh-cashier-filter').value;
@@ -5447,7 +5586,25 @@ function renderSalesHistory(){
   if(to) filtered=filtered.filter(s=>s.date<=to+'T23:59:59');
   if(cashierF) filtered=filtered.filter(s=>s.cashierId===cashierF);
   if(paymentF) filtered=filtered.filter(s=>s.paymentMethod===paymentF);
-  filtered=filtered.sort((a,b)=>b.date.localeCompare(a.date));
+
+  // Sort
+  const numCols=new Set(['subtotal','tax','total']);
+  filtered=filtered.sort((a,b)=>{
+    let av,bv;
+    if(shSort.col==='date'){av=a.date;bv=b.date;return shSort.dir==='asc'?av.localeCompare(bv):bv.localeCompare(av);}
+    if(shSort.col==='cashier'){av=a.cashierName||'';bv=b.cashierName||'';return shSort.dir==='asc'?av.localeCompare(bv):bv.localeCompare(av);}
+    av=a[shSort.col]||0;bv=b[shSort.col]||0;
+    return shSort.dir==='asc'?av-bv:bv-av;
+  });
+
+  // Update sort indicators
+  ['date','cashier','subtotal','tax','total'].forEach(col=>{
+    const th=document.getElementById('sh-th-'+col);
+    const si=document.getElementById('sh-si-'+col);
+    if(!si) return;
+    if(shSort.col===col){si.textContent=shSort.dir==='asc'?'↑':'↓';if(th)th.classList.add('sorted');}
+    else{si.textContent='↕';if(th)th.classList.remove('sorted');}
+  });
 
   // Summary stats
   const total=filtered.reduce((a,s)=>a+s.total,0);
@@ -5790,6 +5947,8 @@ function openSupplierStatement(supplierId){
 let returnItems=[];
 
 function renderReturns(){
+  const dsEl=document.getElementById('ret-date-shortcuts');
+  if(dsEl&&!dsEl.dataset.built){dsEl.innerHTML=_dsHtml('ret-date-from','ret-date-to','renderReturns');dsEl.dataset.built='1';}
   const from=document.getElementById('ret-date-from').value;
   const to=document.getElementById('ret-date-to').value;
   const mf=document.getElementById('ret-method-filter').value;
