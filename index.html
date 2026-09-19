@@ -240,14 +240,16 @@ tr:hover td{background:var(--gray50)}
 .disc-apply-btn{padding:3px 10px;background:var(--green);color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer}
 .disc-clear-btn{padding:3px 8px;background:none;border:1px solid var(--gray200);border-radius:6px;font-size:11px;color:var(--gray500);cursor:pointer}
 .cart-discount-row{display:flex;justify-content:space-between;font-size:13px;color:var(--red);margin-bottom:4px}
-.cart-footer{border-top:1px solid var(--gray200);padding:14px}
-.cart-totals{margin-bottom:12px}
-.cart-row{display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px;color:var(--gray600)}
-.cart-total-row{display:flex;justify-content:space-between;font-size:16px;font-weight:700;padding-top:8px;border-top:1px dashed var(--gray200);margin-top:4px}
-.payment-methods{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px}
-.pay-btn{padding:10px;border-radius:var(--radius);font-weight:600;font-size:13px;border:1.5px solid var(--gray200);background:var(--white);cursor:pointer;transition:all .15s}
+.cart-footer{border-top:1px solid var(--gray200);padding:10px 12px}
+.cart-totals{margin-bottom:8px}
+.cart-row{display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px;color:var(--gray600)}
+.cart-total-row{display:flex;justify-content:space-between;font-size:15px;font-weight:700;padding-top:6px;border-top:1px dashed var(--gray200);margin-top:3px}
+.payment-methods{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px}
+.pay-btn{padding:8px 6px;border-radius:var(--radius);font-weight:600;font-size:12px;border:1.5px solid var(--gray200);background:var(--white);cursor:pointer;transition:all .15s}
 .pay-btn.active{border-color:var(--green);background:var(--green-light);color:var(--green-dark)}
 .pay-btn:hover{border-color:var(--gray300)}
+.cp-type-btn{flex:1;padding:6px 8px;border-radius:var(--radius);font-size:12px;font-weight:600;border:1.5px solid var(--gray200);background:var(--white);cursor:pointer;transition:all .15s}
+.cp-type-btn.active{border-color:var(--amber);background:#fffbeb;color:#92400e}
 .checkout-btn{width:100%;padding:12px;background:var(--green);color:#fff;border-radius:var(--radius);font-size:15px;font-weight:700;border:none;cursor:pointer;transition:background .15s}
 .checkout-btn:hover{background:var(--green-dark)}
 .checkout-btn:disabled{opacity:.5;cursor:not-allowed}
@@ -399,11 +401,11 @@ th.sort-asc .sort-icon,th.sort-desc .sort-icon{opacity:1;color:var(--green)}
 .cust-detail-tab{padding:8px 16px;border-radius:var(--radius) var(--radius) 0 0;font-weight:500;cursor:pointer;color:var(--gray500);border-bottom:2px solid transparent;margin-bottom:-2px;background:transparent;font-size:13px;transition:all .15s}
 .cust-detail-tab.active{color:var(--green);border-bottom-color:var(--green);background:var(--green-light)}
 /* ── POS CUSTOMER SELECTOR ── */
-.pos-customer-section{background:var(--gray50);border-radius:var(--radius);padding:10px;margin-bottom:10px;border:1px solid var(--gray200)}
-.credit-info-box{background:var(--blue-light);border-radius:6px;padding:8px 10px;font-size:12px;margin-top:6px;display:flex;gap:12px}
+.pos-customer-section{background:var(--gray50);border-radius:var(--radius);padding:8px 10px;margin-bottom:8px;border:1px solid var(--gray200)}
+.credit-info-box{background:var(--blue-light);border-radius:6px;padding:6px 10px;font-size:11px;margin-top:5px;display:flex;gap:10px;flex-wrap:wrap}
 .credit-info-box.warning{background:var(--amber-light)}
 .credit-info-box.danger{background:var(--red-light)}
-.partial-section{background:var(--gray50);border-radius:var(--radius);padding:10px;margin-bottom:10px;border:1px dashed var(--amber)}
+.partial-section{background:var(--gray50);border-radius:var(--radius);padding:8px 10px;margin-bottom:8px;border:1px dashed var(--amber)}
 /* ── EMPTY STATE ── */
 .empty-state{text-align:center;padding:48px 24px;color:var(--gray400)}
 .empty-state .empty-icon{font-size:48px;margin-bottom:12px}
@@ -647,7 +649,41 @@ th.sort-asc .sort-icon,th.sort-desc .sort-icon{opacity:1;color:var(--green)}
         <input class="form-control" id="login-password" type="password" placeholder="Enter password" autocomplete="current-password" required>
       </div>
       <button type="submit" class="btn btn-primary btn-lg w-full" id="login-btn" style="margin-top:4px">Sign In</button>
+      <div style="text-align:center;margin-top:8px">
+        <button type="button" onclick="showRecovery()" style="background:none;border:none;color:var(--gray400);font-size:12px;cursor:pointer;text-decoration:underline">Forgot password?</button>
+      </div>
     </form>
+
+    <!-- Recovery panel (hidden by default) -->
+    <div id="recovery-panel" style="display:none;flex-direction:column;gap:14px">
+      <div style="text-align:center;margin-bottom:4px">
+        <div style="font-size:15px;font-weight:700;color:var(--gray700)">Reset Password</div>
+        <div style="font-size:12px;color:var(--gray400);margin-top:2px">Enter your username and the recovery PIN set by your admin</div>
+      </div>
+      <div id="recovery-error" class="login-error hidden"></div>
+      <div class="form-group">
+        <label>Username</label>
+        <input class="form-control" id="rec-username" type="text" placeholder="Enter username" autocomplete="off">
+      </div>
+      <div class="form-group">
+        <label>Recovery PIN</label>
+        <input class="form-control" id="rec-pin" type="password" placeholder="Enter recovery PIN" autocomplete="off" inputmode="numeric">
+      </div>
+      <div id="rec-newpass-wrap" style="display:none;flex-direction:column;gap:14px">
+        <div class="form-group">
+          <label>New Password</label>
+          <input class="form-control" id="rec-newpass" type="password" placeholder="Enter new password">
+        </div>
+        <div class="form-group">
+          <label>Confirm Password</label>
+          <input class="form-control" id="rec-confirm" type="password" placeholder="Confirm new password">
+        </div>
+      </div>
+      <button class="btn btn-primary btn-lg w-full" id="rec-btn" onclick="submitRecovery()">Verify PIN</button>
+      <div style="text-align:center">
+        <button type="button" onclick="backToLogin()" style="background:none;border:none;color:var(--gray400);font-size:12px;cursor:pointer;text-decoration:underline">← Back to login</button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -851,24 +887,25 @@ th.sort-asc .sort-icon,th.sort-desc .sort-icon{opacity:1;color:var(--green)}
               <div id="pos-credit-info" class="hidden" style="margin-top:6px"></div>
             </div>
             <!-- Payment Method -->
-            <div style="margin-bottom:10px">
+            <div style="margin-bottom:8px">
               <div style="font-size:11px;font-weight:700;color:var(--gray500);text-transform:uppercase;margin-bottom:5px">Payment Method</div>
-              <div class="payment-methods" style="grid-template-columns:1fr 1fr 1fr">
+              <div class="payment-methods">
                 <button class="pay-btn active" data-method="cash" onclick="selectPayment('cash')">💵 Cash</button>
                 <button class="pay-btn" data-method="mpesa" onclick="selectPayment('mpesa')">📱 M-Pesa</button>
-                <button class="pay-btn" data-method="card" onclick="selectPayment('card')">💳 Card</button>
-                <button class="pay-btn" data-method="credit" onclick="selectPayment('credit')">📒 Full Credit</button>
-                <button class="pay-btn" data-method="partial" onclick="selectPayment('partial')" style="grid-column:2/4">⚖️ Partial Payment</button>
+                <button class="pay-btn" data-method="creditpartial" onclick="selectPayment('creditpartial')" style="grid-column:1/-1">📒 Credit / Partial</button>
               </div>
             </div>
-            <!-- Partial Payment Section -->
-            <div id="partial-payment-section" class="partial-section hidden">
-              <div style="font-size:12px;font-weight:600;color:var(--amber);margin-bottom:6px">⚖️ Split Payment</div>
-              <div class="form-group">
-                <label style="font-size:11px">Amount Paid Now (KES)</label>
-                <input class="form-control" type="number" id="partial-paid-input" placeholder="0.00" min="0" oninput="updatePartialInfo()" style="font-size:13px">
+            <!-- Credit / Partial combined section -->
+            <div id="credit-partial-section" class="partial-section hidden">
+              <div style="display:flex;gap:6px;margin-bottom:8px">
+                <button class="cp-type-btn active" id="cp-full-btn" onclick="selectCreditType('credit')">📒 Full Credit</button>
+                <button class="cp-type-btn" id="cp-part-btn" onclick="selectCreditType('partial')">⚖️ Partial Payment</button>
               </div>
-              <div id="partial-balance-display" style="margin-top:6px;font-size:12px;color:var(--gray600)"></div>
+              <div id="partial-amount-wrap" class="hidden">
+                <label style="font-size:11px;font-weight:600;color:var(--gray600)">Amount Paid Now (KES)</label>
+                <input class="form-control" type="number" id="partial-paid-input" placeholder="0.00" min="0" oninput="updatePartialInfo()" style="font-size:13px;margin-top:4px">
+                <div id="partial-balance-display" style="margin-top:5px;font-size:12px;color:var(--gray600)"></div>
+              </div>
             </div>
             <button class="checkout-btn" id="checkout-btn" onclick="checkout()" disabled>
               Charge — KES 0
@@ -995,8 +1032,8 @@ th.sort-asc .sort-icon,th.sort-desc .sort-icon{opacity:1;color:var(--green)}
             <option value="">All Payments</option>
             <option value="cash">Cash</option>
             <option value="mpesa">M-Pesa</option>
-            <option value="card">Card</option>
-            <option value="credit">Credit</option>
+            <option value="credit">Full Credit</option>
+            <option value="partial">Partial</option>
           </select>
           <button class="btn btn-secondary" onclick="resetSHFilters()">Clear Filters</button>
           <button class="btn btn-secondary" onclick="exportSalesCSV()" style="margin-left:auto">📊 Export CSV</button>
@@ -1586,6 +1623,10 @@ th.sort-asc .sort-icon,th.sort-desc .sort-icon{opacity:1;color:var(--green)}
           <option value="manager">Manager</option>
           <option value="admin">Admin / Owner</option>
         </select>
+      </div>
+      <div class="form-group">
+        <label>Recovery PIN <span style="font-weight:400;color:var(--gray400);font-size:11px">(used if user forgets password)</span></label>
+        <input class="form-control" type="text" id="user-recovery-pin" placeholder="e.g. 1234 — leave blank to keep current" inputmode="numeric" maxlength="12">
       </div>
     </div>
     <div class="modal-footer">
@@ -2677,12 +2718,12 @@ const ROLE_ACCESS={
 
 document.getElementById('login-form').addEventListener('submit',async e=>{
   e.preventDefault();
-  const uname=document.getElementById('login-username').value.trim();
+  const uname=document.getElementById('login-username').value.trim().toLowerCase();
   const pass=document.getElementById('login-password').value;
 
   // Try local first (fast path)
   let users=DB.all('users');
-  let user=users.find(u=>u.username===uname&&u.password===pass&&u.active);
+  let user=users.find(u=>u.username===uname&&u.password===pass&&u.active!==false);
 
   // If not found locally and online, fetch latest users from Supabase and retry.
   if(!user&&navigator.onLine){
@@ -2692,7 +2733,7 @@ document.getElementById('login-form').addEventListener('submit',async e=>{
       const cloudUsers=await SB.query('users',{limit:200});
       if(cloudUsers&&cloudUsers.length>0){
         DB.set('users',cloudUsers);
-        user=cloudUsers.find(u=>u.username===uname&&u.password===pass&&u.active);
+        user=cloudUsers.find(u=>u.username===uname&&u.password===pass&&u.active!==false);
       }
     }catch(_){}
     document.getElementById('login-btn').disabled=false;
@@ -2735,6 +2776,82 @@ function showLoginError(msg){
     document.getElementById('login-password').value='';
     document.getElementById('login-password').focus();
   },1800);
+}
+
+/* ── Forgot Password / Recovery ── */
+let _recVerified=false; // true after PIN verified, waiting for new password
+
+function showRecovery(){
+  _recVerified=false;
+  document.getElementById('login-form').style.display='none';
+  document.getElementById('recovery-panel').style.display='flex';
+  document.getElementById('recovery-error').classList.add('hidden');
+  document.getElementById('rec-username').value='';
+  document.getElementById('rec-pin').value='';
+  document.getElementById('rec-newpass').value='';
+  document.getElementById('rec-confirm').value='';
+  document.getElementById('rec-newpass-wrap').style.display='none';
+  document.getElementById('rec-btn').textContent='Verify PIN';
+  _mascot('🔑','Enter your recovery PIN','',true);
+  document.getElementById('rec-username').focus();
+}
+
+function backToLogin(){
+  _recVerified=false;
+  document.getElementById('recovery-panel').style.display='none';
+  document.getElementById('login-form').style.display='flex';
+  document.getElementById('recovery-error').classList.add('hidden');
+  document.getElementById('login-error').classList.add('hidden');
+  _mascotReset();
+}
+
+async function submitRecovery(){
+  const uname=document.getElementById('rec-username').value.trim().toLowerCase();
+  const pin=document.getElementById('rec-pin').value.trim();
+  const errEl=document.getElementById('recovery-error');
+  function recErr(msg){errEl.textContent=msg;errEl.classList.remove('hidden');_mascot('🙈','Check your details','err',false);setTimeout(()=>{errEl.classList.add('hidden');_mascot('🔑','Enter your recovery PIN','',true);},2000);}
+
+  if(!_recVerified){
+    // Step 1: verify PIN
+    if(!uname||!pin){recErr('Enter your username and recovery PIN.');return;}
+    let users=DB.all('users');
+    let user=users.find(u=>u.username===uname&&u.recoveryPin&&String(u.recoveryPin)===String(pin)&&u.active!==false);
+    if(!user&&navigator.onLine){
+      _mascot('🤔','Checking…','',false);
+      document.getElementById('rec-btn').disabled=true;
+      try{
+        const cu=await SB.query('users',{limit:200});
+        if(cu&&cu.length>0){DB.set('users',cu);user=cu.find(u=>u.username===uname&&u.recoveryPin&&String(u.recoveryPin)===String(pin)&&u.active!==false);}
+      }catch(_){}
+      document.getElementById('rec-btn').disabled=false;
+    }
+    if(!user){recErr('Username or recovery PIN is incorrect.');return;}
+    // PIN matched — show new password fields
+    _recVerified=true;
+    document.getElementById('rec-newpass-wrap').style.display='flex';
+    document.getElementById('rec-pin').disabled=true;
+    document.getElementById('rec-username').disabled=true;
+    document.getElementById('rec-btn').textContent='Set New Password';
+    _mascot('✅','PIN verified! Set a new password','ok',false);
+    errEl.classList.add('hidden');
+    document.getElementById('rec-newpass').focus();
+  } else {
+    // Step 2: set new password
+    const np=document.getElementById('rec-newpass').value;
+    const nc=document.getElementById('rec-confirm').value;
+    if(!np||np.length<3){recErr('Password must be at least 3 characters.');return;}
+    if(np!==nc){recErr('Passwords do not match.');return;}
+    const users=DB.all('users');
+    const user=users.find(u=>u.username===uname);
+    if(!user){recErr('User not found.');return;}
+    DB.update('users',user.id,{password:np});
+    _mascot('🥳','Password reset! You can log in now','ok',false);
+    setTimeout(()=>{
+      backToLogin();
+      document.getElementById('login-username').value=uname;
+      document.getElementById('login-password').focus();
+    },1800);
+  }
 }
 
 async function _loginSuccess(user){
@@ -3041,7 +3158,7 @@ function holdSale(){
   cart=[];
   document.getElementById('pos-customer-select').value='';
   document.getElementById('pos-credit-info').classList.add('hidden');
-  document.getElementById('partial-payment-section').classList.add('hidden');
+  document.getElementById('credit-partial-section').classList.add('hidden');
   document.querySelector('.pay-btn[data-method="cash"]').click();
   renderCart();
   renderHeldBar();
@@ -3222,14 +3339,28 @@ function clearDiscount(idx){
 }
 
 function selectPayment(method){
-  selectedPayment=method;
-  document.querySelectorAll('.pay-btn').forEach(b=>b.classList.toggle('active',b.dataset.method===method));
-  const needsCustomer=['credit','partial'].includes(method);
-  const partialSection=document.getElementById('partial-payment-section');
-  partialSection.classList.toggle('hidden',method!=='partial');
-  if(needsCustomer&&!document.getElementById('pos-customer-select').value){
-    toast('Please select a customer account for credit/partial sales','warning');
+  document.querySelectorAll('.pay-btn').forEach(b=>b.classList.remove('active'));
+  const btn=document.querySelector(`.pay-btn[data-method="${method}"]`);
+  if(btn) btn.classList.add('active');
+  const cpSection=document.getElementById('credit-partial-section');
+  if(method==='creditpartial'){
+    cpSection.classList.remove('hidden');
+    selectCreditType('credit'); // default to full credit
+    if(!document.getElementById('pos-customer-select').value)
+      toast('Please select a customer account for credit/partial sales','warning');
+  } else {
+    cpSection.classList.add('hidden');
+    selectedPayment=method;
   }
+  updatePartialInfo();
+}
+
+function selectCreditType(type){
+  selectedPayment=type;
+  document.getElementById('cp-full-btn').classList.toggle('active',type==='credit');
+  document.getElementById('cp-part-btn').classList.toggle('active',type==='partial');
+  document.getElementById('partial-amount-wrap').classList.toggle('hidden',type!=='partial');
+  if(type==='partial') setTimeout(()=>{const el=document.getElementById('partial-paid-input');if(el){el.value='';el.focus();}},50);
   updatePartialInfo();
 }
 
@@ -3525,7 +3656,7 @@ function newSale(){
   document.querySelectorAll('.pay-btn').forEach(b=>b.classList.toggle('active',b.dataset.method==='cash'));
   document.getElementById('pos-customer-select').value='';
   document.getElementById('pos-credit-info').classList.add('hidden');
-  document.getElementById('partial-payment-section').classList.add('hidden');
+  document.getElementById('credit-partial-section').classList.add('hidden');
   document.getElementById('partial-paid-input').value='';
   closeModal('receipt-modal-overlay');
   renderPOS();
@@ -5005,6 +5136,7 @@ function openUserModal(id){
   document.getElementById('user-username').value=u?u.username:'';
   document.getElementById('user-pass').value='';
   document.getElementById('user-role').value=u?u.role:'cashier';
+  document.getElementById('user-recovery-pin').value='';
   openModal('user-modal-overlay');
 }
 
@@ -5013,18 +5145,18 @@ function saveUser(){
   const username=document.getElementById('user-username').value.trim().toLowerCase();
   const pass=document.getElementById('user-pass').value;
   const role=document.getElementById('user-role').value;
+  const pin=document.getElementById('user-recovery-pin').value.trim();
   const id=document.getElementById('user-id').value;
   if(!name||!username){toast('Name and username are required','error');return;}
   const users=DB.all('users');
   const dup=users.find(u=>u.username===username&&u.id!==id);
   if(dup){toast('Username already taken','error');return;}
   if(id){
-    const existing=users.find(u=>u.id===id);
-    DB.update('users',id,{name,username,role,...(pass?{password:pass}:{})});
+    DB.update('users',id,{name,username,role,...(pass?{password:pass}:{}),...(pin?{recoveryPin:pin}:{})});
     toast('User updated');
   } else {
     if(!pass){toast('Password is required for new users','error');return;}
-    DB.push('users',{id:uid(),name,username,password:pass,role,active:true,created:now()});
+    DB.push('users',{id:uid(),name,username,password:pass,role,active:true,created:now(),...(pin?{recoveryPin:pin}:{})});
     toast('User created');
   }
   closeModal('user-modal-overlay');
