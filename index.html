@@ -656,20 +656,38 @@ th.sort-asc .sort-icon,th.sort-desc .sort-icon{opacity:1;color:var(--green)}
 
     <!-- Recovery panel (hidden by default) -->
     <div id="recovery-panel" style="display:none;flex-direction:column;gap:14px">
-      <div style="text-align:center;margin-bottom:4px">
+      <div style="text-align:center;margin-bottom:2px">
         <div style="font-size:15px;font-weight:700;color:var(--gray700)">Reset Password</div>
-        <div style="font-size:12px;color:var(--gray400);margin-top:2px">Enter your username and the recovery PIN set by your admin</div>
       </div>
       <div id="recovery-error" class="login-error hidden"></div>
-      <div class="form-group">
-        <label>Username</label>
-        <input class="form-control" id="rec-username" type="text" placeholder="Enter username" autocomplete="off">
+
+      <!-- Step 1: Enter username -->
+      <div id="rec-step-1" style="display:flex;flex-direction:column;gap:14px">
+        <div style="font-size:12px;color:var(--gray400);text-align:center">Enter your username — an OTP will be sent to your registered email</div>
+        <div class="form-group">
+          <label>Username</label>
+          <input class="form-control" id="rec-username" type="text" placeholder="Enter username" autocomplete="off">
+        </div>
+        <button class="btn btn-primary btn-lg w-full" id="rec-send-btn" onclick="sendRecoveryOTP()">Send OTP to Email</button>
       </div>
-      <div class="form-group">
-        <label>Recovery PIN</label>
-        <input class="form-control" id="rec-pin" type="password" placeholder="Enter recovery PIN" autocomplete="off" inputmode="numeric">
+
+      <!-- Step 2: Enter OTP -->
+      <div id="rec-step-2" style="display:none;flex-direction:column;gap:12px">
+        <div style="text-align:center;font-size:12px;color:var(--gray500)">OTP sent to <strong id="rec-masked-email"></strong></div>
+        <div id="rec-countdown" style="text-align:center;font-size:14px;font-weight:700;color:var(--amber)">⏱ 2:00</div>
+        <div class="form-group">
+          <label>Enter 6-digit OTP</label>
+          <input class="form-control" id="rec-otp" type="text" inputmode="numeric" maxlength="6" placeholder="e.g. 483920" autocomplete="off" style="letter-spacing:6px;font-size:18px;text-align:center">
+        </div>
+        <button class="btn btn-primary btn-lg w-full" onclick="verifyRecoveryOTP()">Verify OTP</button>
+        <div style="text-align:center">
+          <button onclick="sendRecoveryOTP()" style="background:none;border:none;color:var(--green);font-size:12px;cursor:pointer;text-decoration:underline">Resend OTP</button>
+        </div>
       </div>
-      <div id="rec-newpass-wrap" style="display:none;flex-direction:column;gap:14px">
+
+      <!-- Step 3: Set new password -->
+      <div id="rec-step-3" style="display:none;flex-direction:column;gap:14px">
+        <div style="font-size:12px;color:var(--gray400);text-align:center">OTP verified ✓ — set your new password</div>
         <div class="form-group">
           <label>New Password</label>
           <input class="form-control" id="rec-newpass" type="password" placeholder="Enter new password">
@@ -678,8 +696,9 @@ th.sort-asc .sort-icon,th.sort-desc .sort-icon{opacity:1;color:var(--green)}
           <label>Confirm Password</label>
           <input class="form-control" id="rec-confirm" type="password" placeholder="Confirm new password">
         </div>
+        <button class="btn btn-primary btn-lg w-full" onclick="setRecoveryPassword()">Set New Password</button>
       </div>
-      <button class="btn btn-primary btn-lg w-full" id="rec-btn" onclick="submitRecovery()">Verify PIN</button>
+
       <div style="text-align:center">
         <button type="button" onclick="backToLogin()" style="background:none;border:none;color:var(--gray400);font-size:12px;cursor:pointer;text-decoration:underline">← Back to login</button>
       </div>
@@ -1326,7 +1345,7 @@ th.sort-asc .sort-icon,th.sort-desc .sort-icon{opacity:1;color:var(--green)}
           <div class="table-wrap">
             <table>
               <thead>
-                <tr><th>Name</th><th>Username</th><th>Role</th><th>Status</th><th>Created</th><th>Actions</th></tr>
+                <tr><th>Name</th><th>Username</th><th>Email</th><th>Role</th><th>Status</th><th>Created</th><th>Actions</th></tr>
               </thead>
               <tbody id="users-tbody"></tbody>
             </table>
@@ -1365,6 +1384,32 @@ th.sort-asc .sort-icon,th.sort-desc .sort-icon{opacity:1;color:var(--green)}
                 Enable VAT on sales
               </label>
               <button class="btn btn-primary" onclick="saveSettings()">Save Settings</button>
+            </div>
+          </div>
+          <div class="card" style="margin-top:16px">
+            <div class="card-header"><h3>📧 Email / OTP Settings</h3></div>
+            <div class="card-body" style="display:flex;flex-direction:column;gap:14px">
+              <p style="font-size:13px;color:var(--gray500);margin:0">
+                Configure <strong>EmailJS</strong> to enable OTP-based password recovery.
+                <a href="https://www.emailjs.com" target="_blank" style="color:var(--green)">Create a free account at emailjs.com</a>,
+                add an email service, create a template with variables <code>{{to_email}}</code>, <code>{{to_name}}</code> and <code>{{otp_code}}</code>, then paste the IDs below.
+              </p>
+              <div class="form-group">
+                <label>EmailJS Public Key</label>
+                <input class="form-control" id="set-ejs-key" placeholder="e.g. AbCdEfGhIjKl12345">
+              </div>
+              <div class="form-group">
+                <label>Service ID</label>
+                <input class="form-control" id="set-ejs-service" placeholder="e.g. service_xxxxxxx">
+              </div>
+              <div class="form-group">
+                <label>Template ID</label>
+                <input class="form-control" id="set-ejs-template" placeholder="e.g. template_xxxxxxx">
+              </div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap">
+                <button class="btn btn-primary" onclick="saveEmailJSSettings()">Save Email Settings</button>
+                <button class="btn btn-secondary" onclick="testEmailJS()">Send Test OTP to My Email</button>
+              </div>
             </div>
           </div>
           <div class="card" style="margin-top:16px">
@@ -1616,6 +1661,10 @@ th.sort-asc .sort-icon,th.sort-desc .sort-icon{opacity:1;color:var(--green)}
         <input class="form-control" type="password" id="user-pass" placeholder="Leave blank to keep current">
       </div>
       <div class="form-group">
+        <label>Email Address * <span style="font-weight:400;color:var(--gray400);font-size:11px">(used for OTP password recovery)</span></label>
+        <input class="form-control" type="email" id="user-email" placeholder="john@example.com" autocomplete="off">
+      </div>
+      <div class="form-group">
         <label>Role *</label>
         <select class="form-control" id="user-role">
           <option value="cashier">Cashier</option>
@@ -1623,10 +1672,6 @@ th.sort-asc .sort-icon,th.sort-desc .sort-icon{opacity:1;color:var(--green)}
           <option value="manager">Manager</option>
           <option value="admin">Admin / Owner</option>
         </select>
-      </div>
-      <div class="form-group">
-        <label>Recovery PIN <span style="font-weight:400;color:var(--gray400);font-size:11px">(used if user forgets password)</span></label>
-        <input class="form-control" type="text" id="user-recovery-pin" placeholder="e.g. 1234 — leave blank to keep current" inputmode="numeric" maxlength="12">
       </div>
     </div>
     <div class="modal-footer">
@@ -2778,26 +2823,33 @@ function showLoginError(msg){
   },1800);
 }
 
-/* ── Forgot Password / Recovery ── */
-let _recVerified=false; // true after PIN verified, waiting for new password
+/* ── Forgot Password / OTP Recovery ── */
+let _otpStore=null;   // {code, expiry, username, userId}
+let _otpCountdown=null; // interval id
 
 function showRecovery(){
-  _recVerified=false;
+  if(_otpCountdown){clearInterval(_otpCountdown);_otpCountdown=null;}
+  _otpStore=null;
   document.getElementById('login-form').style.display='none';
   document.getElementById('recovery-panel').style.display='flex';
   document.getElementById('recovery-error').classList.add('hidden');
+  // Reset all three steps
+  document.getElementById('rec-step-1').style.display='flex';
+  document.getElementById('rec-step-2').style.display='none';
+  document.getElementById('rec-step-3').style.display='none';
   document.getElementById('rec-username').value='';
-  document.getElementById('rec-pin').value='';
+  document.getElementById('rec-otp').value='';
   document.getElementById('rec-newpass').value='';
   document.getElementById('rec-confirm').value='';
-  document.getElementById('rec-newpass-wrap').style.display='none';
-  document.getElementById('rec-btn').textContent='Verify PIN';
-  _mascot('🔑','Enter your recovery PIN','',true);
+  document.getElementById('rec-countdown').textContent='⏱ 2:00';
+  document.getElementById('rec-send-btn').disabled=false;
+  _mascot('📧','Enter your username to reset','',true);
   document.getElementById('rec-username').focus();
 }
 
 function backToLogin(){
-  _recVerified=false;
+  if(_otpCountdown){clearInterval(_otpCountdown);_otpCountdown=null;}
+  _otpStore=null;
   document.getElementById('recovery-panel').style.display='none';
   document.getElementById('login-form').style.display='flex';
   document.getElementById('recovery-error').classList.add('hidden');
@@ -2805,53 +2857,121 @@ function backToLogin(){
   _mascotReset();
 }
 
-async function submitRecovery(){
+async function sendRecoveryOTP(){
   const uname=document.getElementById('rec-username').value.trim().toLowerCase();
-  const pin=document.getElementById('rec-pin').value.trim();
   const errEl=document.getElementById('recovery-error');
-  function recErr(msg){errEl.textContent=msg;errEl.classList.remove('hidden');_mascot('🙈','Check your details','err',false);setTimeout(()=>{errEl.classList.add('hidden');_mascot('🔑','Enter your recovery PIN','',true);},2000);}
+  function recErr(msg){errEl.textContent=msg;errEl.classList.remove('hidden');setTimeout(()=>errEl.classList.add('hidden'),3000);}
+  if(!uname){recErr('Enter your username.');return;}
 
-  if(!_recVerified){
-    // Step 1: verify PIN
-    if(!uname||!pin){recErr('Enter your username and recovery PIN.');return;}
-    let users=DB.all('users');
-    let user=users.find(u=>u.username===uname&&u.recoveryPin&&String(u.recoveryPin)===String(pin)&&u.active!==false);
-    if(!user&&navigator.onLine){
-      _mascot('🤔','Checking…','',false);
-      document.getElementById('rec-btn').disabled=true;
-      try{
-        const cu=await SB.query('users',{limit:200});
-        if(cu&&cu.length>0){DB.set('users',cu);user=cu.find(u=>u.username===uname&&u.recoveryPin&&String(u.recoveryPin)===String(pin)&&u.active!==false);}
-      }catch(_){}
-      document.getElementById('rec-btn').disabled=false;
-    }
-    if(!user){recErr('Username or recovery PIN is incorrect.');return;}
-    // PIN matched — show new password fields
-    _recVerified=true;
-    document.getElementById('rec-newpass-wrap').style.display='flex';
-    document.getElementById('rec-pin').disabled=true;
-    document.getElementById('rec-username').disabled=true;
-    document.getElementById('rec-btn').textContent='Set New Password';
-    _mascot('✅','PIN verified! Set a new password','ok',false);
-    errEl.classList.add('hidden');
-    document.getElementById('rec-newpass').focus();
-  } else {
-    // Step 2: set new password
-    const np=document.getElementById('rec-newpass').value;
-    const nc=document.getElementById('rec-confirm').value;
-    if(!np||np.length<3){recErr('Password must be at least 3 characters.');return;}
-    if(np!==nc){recErr('Passwords do not match.');return;}
-    const users=DB.all('users');
-    const user=users.find(u=>u.username===uname);
-    if(!user){recErr('User not found.');return;}
-    DB.update('users',user.id,{password:np});
-    _mascot('🥳','Password reset! You can log in now','ok',false);
-    setTimeout(()=>{
-      backToLogin();
-      document.getElementById('login-username').value=uname;
-      document.getElementById('login-password').focus();
-    },1800);
+  // Find user
+  let users=DB.all('users');
+  let user=users.find(u=>u.username===uname&&u.active!==false);
+  if(!user&&navigator.onLine){
+    _mascot('🤔','Checking…','',false);
+    try{const cu=await SB.query('users',{limit:200});if(cu&&cu.length>0){DB.set('users',cu);user=cu.find(u=>u.username===uname&&u.active!==false);}}catch(_){}
   }
+  if(!user){recErr('No active account found for that username.');_mascot('🙈','Username not found','err',false);return;}
+  if(!user.email){recErr('This account has no email address set. Contact an administrator.');_mascot('🙈','No email on file','err',false);return;}
+
+  // Check EmailJS config
+  const cfg=DB.get('emailjs_config')||{};
+  if(!cfg.publicKey||!cfg.serviceId||!cfg.templateId){
+    recErr('Email service not configured. Contact an administrator.');return;
+  }
+
+  const btn=document.getElementById('rec-send-btn');
+  btn.disabled=true;btn.textContent='Sending…';
+  _mascot('📤','Sending OTP…','',false);
+
+  const otp=String(Math.floor(100000+Math.random()*900000));
+  const expiry=Date.now()+2*60*1000; // 2 minutes
+
+  try{
+    if(typeof emailjs==='undefined') throw new Error('EmailJS not loaded');
+    emailjs.init(cfg.publicKey);
+    await emailjs.send(cfg.serviceId,cfg.templateId,{
+      to_email:user.email,to_name:user.name,otp_code:otp,app_name:'NairobiPOS'
+    });
+  }catch(e){
+    recErr('Failed to send OTP: '+((e&&e.text)||e.message||'unknown error'));
+    btn.disabled=false;btn.textContent='Send OTP to Email';
+    _mascot('😬','Email failed','err',false);
+    return;
+  }
+
+  _otpStore={code:otp,expiry,username:uname,userId:user.id};
+
+  // Mask email: a***@domain.com
+  const parts=user.email.split('@');
+  const masked=parts[0].charAt(0)+'***@'+parts[1];
+  document.getElementById('rec-masked-email').textContent=masked;
+
+  document.getElementById('rec-step-1').style.display='none';
+  document.getElementById('rec-step-2').style.display='flex';
+  document.getElementById('rec-otp').value='';
+  document.getElementById('rec-otp').focus();
+  _mascot('📬','Check your email for the OTP','ok',false);
+  errEl.classList.add('hidden');
+  btn.disabled=false;btn.textContent='Send OTP to Email';
+  _startOTPCountdown();
+}
+
+function _startOTPCountdown(){
+  if(_otpCountdown){clearInterval(_otpCountdown);}
+  const el=document.getElementById('rec-countdown');
+  let secs=120;
+  el.textContent='⏱ 2:00';
+  _otpCountdown=setInterval(()=>{
+    secs--;
+    const m=Math.floor(secs/60);
+    const s=String(secs%60).padStart(2,'0');
+    el.textContent=`⏱ ${m}:${s}`;
+    if(secs<=0){
+      clearInterval(_otpCountdown);_otpCountdown=null;
+      el.textContent='⌛ Expired';
+      el.style.color='var(--red)';
+      _otpStore=null;
+    }
+  },1000);
+}
+
+function verifyRecoveryOTP(){
+  const entered=document.getElementById('rec-otp').value.trim();
+  const errEl=document.getElementById('recovery-error');
+  function recErr(msg){errEl.textContent=msg;errEl.classList.remove('hidden');setTimeout(()=>errEl.classList.add('hidden'),3000);}
+  if(!_otpStore){recErr('OTP expired. Request a new one.');return;}
+  if(Date.now()>_otpStore.expiry){_otpStore=null;recErr('OTP has expired. Request a new one.');return;}
+  if(entered!==_otpStore.code){recErr('Incorrect OTP. Try again.');_mascot('🙈','Wrong code','err',false);return;}
+  // OTP correct
+  if(_otpCountdown){clearInterval(_otpCountdown);_otpCountdown=null;}
+  document.getElementById('rec-step-2').style.display='none';
+  document.getElementById('rec-step-3').style.display='flex';
+  document.getElementById('rec-newpass').focus();
+  _mascot('✅','OTP verified! Set a new password','ok',false);
+  errEl.classList.add('hidden');
+}
+
+function setRecoveryPassword(){
+  const np=document.getElementById('rec-newpass').value;
+  const nc=document.getElementById('rec-confirm').value;
+  const errEl=document.getElementById('recovery-error');
+  function recErr(msg){errEl.textContent=msg;errEl.classList.remove('hidden');setTimeout(()=>errEl.classList.add('hidden'),3000);}
+  if(!_otpStore){recErr('Session expired. Start over.');return;}
+  if(!np||np.length<3){recErr('Password must be at least 3 characters.');return;}
+  if(np!==nc){recErr('Passwords do not match.');return;}
+  const uname=_otpStore.username;
+  const users=DB.all('users');
+  const user=users.find(u=>u.username===uname);
+  if(!user){recErr('User not found.');return;}
+  DB.update('users',user.id,{password:np});
+  if(navigator.onLine) SB.syncObj('users/'+user.id,{...user,password:np}).catch(()=>{});
+  _otpStore=null;
+  _mascot('🥳','Password reset! Log in now','ok',false);
+  setTimeout(()=>{
+    backToLogin();
+    document.getElementById('login-username').value=uname;
+    document.getElementById('login-password').focus();
+  },1800);
 }
 
 async function _loginSuccess(user){
@@ -5115,6 +5235,7 @@ function renderUsers(){
       <div class="user-avatar" style="width:32px;height:32px;font-size:12px;background:var(--green);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700">${u.name[0]}</div>
       <strong>${u.name}</strong></div></td>
     <td style="font-family:monospace">${u.username}</td>
+    <td style="font-size:12px;color:var(--gray500)">${u.email||'<span style="color:var(--gray300)">—</span>'}</td>
     <td><span class="badge ${u.role==='admin'?'badge-red':u.role==='manager'?'badge-blue':u.role==='stock'?'badge-amber':'badge-gray'}">${roleName(u.role)}</span></td>
     <td>${u.active?'<span class="badge badge-green">Active</span>':'<span class="badge badge-red">Inactive</span>'}</td>
     <td style="font-size:12px">${fmtDate(u.created)}</td>
@@ -5134,29 +5255,31 @@ function openUserModal(id){
   document.getElementById('user-id').value=u?u.id:'';
   document.getElementById('user-name').value=u?u.name:'';
   document.getElementById('user-username').value=u?u.username:'';
+  document.getElementById('user-email').value=u?u.email||'':'';
   document.getElementById('user-pass').value='';
   document.getElementById('user-role').value=u?u.role:'cashier';
-  document.getElementById('user-recovery-pin').value='';
   openModal('user-modal-overlay');
 }
 
 function saveUser(){
   const name=document.getElementById('user-name').value.trim();
   const username=document.getElementById('user-username').value.trim().toLowerCase();
+  const email=document.getElementById('user-email').value.trim().toLowerCase();
   const pass=document.getElementById('user-pass').value;
   const role=document.getElementById('user-role').value;
-  const pin=document.getElementById('user-recovery-pin').value.trim();
   const id=document.getElementById('user-id').value;
   if(!name||!username){toast('Name and username are required','error');return;}
+  if(!email){toast('Email address is required','error');return;}
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){toast('Enter a valid email address','error');return;}
   const users=DB.all('users');
   const dup=users.find(u=>u.username===username&&u.id!==id);
   if(dup){toast('Username already taken','error');return;}
   if(id){
-    DB.update('users',id,{name,username,role,...(pass?{password:pass}:{}),...(pin?{recoveryPin:pin}:{})});
+    DB.update('users',id,{name,username,email,role,...(pass?{password:pass}:{})});
     toast('User updated');
   } else {
     if(!pass){toast('Password is required for new users','error');return;}
-    DB.push('users',{id:uid(),name,username,password:pass,role,active:true,created:now(),...(pin?{recoveryPin:pin}:{})});
+    DB.push('users',{id:uid(),name,username,email,password:pass,role,active:true,created:now()});
     toast('User created');
   }
   closeModal('user-modal-overlay');
@@ -5191,6 +5314,11 @@ function loadSettingsForm(){
   document.getElementById('set-vat').value=s.vatRate||16;
   document.getElementById('set-footer').value=s.receiptFooter||'';
   document.getElementById('set-vat-enabled').checked=s.vatEnabled!==false;
+  // EmailJS settings
+  const ejs=DB.get('emailjs_config')||{};
+  document.getElementById('set-ejs-key').value=ejs.publicKey||'';
+  document.getElementById('set-ejs-service').value=ejs.serviceId||'';
+  document.getElementById('set-ejs-template').value=ejs.templateId||'';
   // Load targets form
   const targets=DB.get('targets')||{};
   const profitTargets=DB.get('profitTargets')||{};
@@ -5237,6 +5365,33 @@ function saveSettings(){
   SB.syncObj('settings',s);
   document.getElementById('sb-business').textContent=s.bizName||'Your Business';
   toast('Settings saved');
+}
+
+function saveEmailJSSettings(){
+  const publicKey=document.getElementById('set-ejs-key').value.trim();
+  const serviceId=document.getElementById('set-ejs-service').value.trim();
+  const templateId=document.getElementById('set-ejs-template').value.trim();
+  if(!publicKey||!serviceId||!templateId){toast('All three EmailJS fields are required','error');return;}
+  const cfg={publicKey,serviceId,templateId};
+  DB.set('emailjs_config',cfg);
+  SB.syncObj('emailjs_config',cfg);
+  toast('Email settings saved');
+}
+
+async function testEmailJS(){
+  if(!currentUser){toast('You must be logged in to test','error');return;}
+  if(!currentUser.email){toast('Your user account has no email address set','error');return;}
+  const cfg=DB.get('emailjs_config')||{};
+  if(!cfg.publicKey||!cfg.serviceId||!cfg.templateId){toast('Save EmailJS settings first','error');return;}
+  try{
+    const testOtp=Math.floor(100000+Math.random()*900000).toString();
+    if(typeof emailjs==='undefined'){toast('EmailJS SDK not loaded — check internet connection','error');return;}
+    emailjs.init(cfg.publicKey);
+    await emailjs.send(cfg.serviceId,cfg.templateId,{to_email:currentUser.email,to_name:currentUser.name,otp_code:testOtp,app_name:'NairobiPOS'});
+    toast(`Test OTP sent to ${currentUser.email}`,'success');
+  }catch(e){
+    toast('Failed to send: '+((e&&e.text)||e||'unknown error'),'error');
+  }
 }
 function exportSalesCSV(){
   const sales=DB.all('sales');
@@ -7469,5 +7624,6 @@ if(navigator.onLine){
   }).catch(()=>{});
 }
 </script>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 </body>
 </html>
