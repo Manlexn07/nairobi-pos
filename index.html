@@ -1383,6 +1383,10 @@ th.sort-asc .sort-icon,th.sort-desc .sort-icon{opacity:1;color:var(--green)}
                 <input type="checkbox" id="set-vat-enabled" checked style="width:16px;height:16px">
                 Enable VAT on sales
               </label>
+              <div class="form-group">
+                <label>Auto-logout after inactivity (minutes) <span style="font-weight:400;color:var(--gray400);font-size:11px">— 0 to disable</span></label>
+                <input class="form-control" type="number" id="set-inactivity" value="30" min="0" max="480" style="max-width:160px">
+              </div>
               <button class="btn btn-primary" onclick="saveSettings()">Save Settings</button>
             </div>
           </div>
@@ -2754,6 +2758,20 @@ function seedData(){
    AUTH
 ════════════════════════════════════════════════ */
 let currentUser=null;
+let _inactivityTimer=null;
+
+function _resetInactivity(){
+  if(!currentUser) return;
+  clearTimeout(_inactivityTimer);
+  const s=DB.get('settings')||{};
+  const mins=s.inactivityMins!=null?s.inactivityMins:30;
+  if(!mins) return; // 0 = disabled
+  _inactivityTimer=setTimeout(()=>{
+    toast('Logged out due to inactivity','warning');
+    setTimeout(logout,800);
+  },mins*60*1000);
+}
+
 const ROLE_ACCESS={
   admin:['pos','sales-history','returns','quotes','customers','inventory','inv-history','suppliers','receiving','reports','users','settings','marketing','leaderboard'],
   manager:['pos','sales-history','returns','quotes','customers','inventory','inv-history','suppliers','receiving','reports','marketing','leaderboard'],
@@ -3010,6 +3028,11 @@ async function _loginSuccess(user){
 }
 
 function logout(){
+  clearTimeout(_inactivityTimer);
+  _inactivityTimer=null;
+  ['mousemove','mousedown','keypress','scroll','touchstart','click'].forEach(ev=>{
+    document.removeEventListener(ev,_resetInactivity);
+  });
   currentUser=null;
   document.getElementById('app').classList.remove('visible');
   const ls=document.getElementById('login-screen');
@@ -3028,6 +3051,11 @@ function logout(){
    APP INIT
 ════════════════════════════════════════════════ */
 function initApp(){
+  // Inactivity auto-logout
+  ['mousemove','mousedown','keypress','scroll','touchstart','click'].forEach(ev=>{
+    document.addEventListener(ev,_resetInactivity,{passive:true});
+  });
+  _resetInactivity();
   SB.init();
   SB.syncAll().then(()=>{
     // Re-render current page after cloud data loaded
@@ -3149,6 +3177,14 @@ function setPricingTier(tier){
   document.getElementById('tier-retail').classList.toggle('active',tier==='retail');
   document.getElementById('tier-wholesale').classList.toggle('active',tier==='wholesale');
   document.getElementById('tier-transfer').classList.toggle('active',tier==='transfer');
+  // Reprice any items already in the cart to match the new tier
+  if(cart.length){
+    const products=DB.all('products');
+    cart.forEach(item=>{
+      const p=products.find(x=>x.id===item.productId);
+      if(p){const np=priceForTier(p,tier);item.sellPrice=np;item.originalPrice=np;item.tier=tier;}
+    });
+  }
   renderProductGrid();
   renderCart();
 }
@@ -3552,6 +3588,14 @@ function checkout(){
     DB.update('customers',customer.id,{balance:customer.balance+creditAmount,lastCreditDate:now()});
     checkOverdueAlerts();
   }
+  // Clear cart immediately on sale completion
+  cart=[];
+  selectedPayment='cash';
+  document.getElementById('pos-customer-select').value='';
+  document.getElementById('pos-credit-info').classList.add('hidden');
+  document.getElementById('credit-partial-section').classList.add('hidden');
+  document.querySelectorAll('.pay-btn').forEach(b=>b.classList.toggle('active',b.dataset.method==='cash'));
+  renderCart();
   showReceipt(sale);
   renderHeldBar();
 }
@@ -3770,16 +3814,11 @@ function printReceipt(){
 }
 
 function newSale(){
-  cart=[];
-  selectedPayment='cash';
   activePricingTier='retail';
-  document.querySelectorAll('.pay-btn').forEach(b=>b.classList.toggle('active',b.dataset.method==='cash'));
-  document.getElementById('pos-customer-select').value='';
-  document.getElementById('pos-credit-info').classList.add('hidden');
-  document.getElementById('credit-partial-section').classList.add('hidden');
   document.getElementById('partial-paid-input').value='';
   closeModal('receipt-modal-overlay');
-  renderPOS();
+  // Log out after every completed sale — next cashier must sign in
+  logout();
 }
 
 /* ════════════════════════════════════════════════
@@ -5314,6 +5353,7 @@ function loadSettingsForm(){
   document.getElementById('set-vat').value=s.vatRate||16;
   document.getElementById('set-footer').value=s.receiptFooter||'';
   document.getElementById('set-vat-enabled').checked=s.vatEnabled!==false;
+  document.getElementById('set-inactivity').value=s.inactivityMins!=null?s.inactivityMins:30;
   // EmailJS settings
   const ejs=DB.get('emailjs_config')||{};
   document.getElementById('set-ejs-key').value=ejs.publicKey||'';
@@ -5360,7 +5400,8 @@ function setLbMode(mode){
   if(lbEl&&document.getElementById('page-leaderboard')?.classList.contains('active')) lbEl.innerHTML=renderStaffReport();
 }
 function saveSettings(){
-  const s={bizName:document.getElementById('set-biz-name').value.trim(),location:document.getElementById('set-location').value.trim(),phone:document.getElementById('set-phone').value.trim(),vatRate:parseFloat(document.getElementById('set-vat').value)||16,receiptFooter:document.getElementById('set-footer').value.trim(),vatEnabled:document.getElementById('set-vat-enabled').checked};
+  const inactivityMins=parseInt(document.getElementById('set-inactivity').value)||0;
+  const s={bizName:document.getElementById('set-biz-name').value.trim(),location:document.getElementById('set-location').value.trim(),phone:document.getElementById('set-phone').value.trim(),vatRate:parseFloat(document.getElementById('set-vat').value)||16,receiptFooter:document.getElementById('set-footer').value.trim(),vatEnabled:document.getElementById('set-vat-enabled').checked,inactivityMins};
   DB.set('settings',s);
   SB.syncObj('settings',s);
   document.getElementById('sb-business').textContent=s.bizName||'Your Business';
