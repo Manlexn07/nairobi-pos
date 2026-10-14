@@ -438,8 +438,67 @@ th.sort-asc .sort-icon,th.sort-desc .sort-icon{opacity:1;color:var(--green)}
 
 /* ── PRICING TIER ── */
 .pricing-tier-bar{display:flex;gap:4px;margin-bottom:8px}
-.tier-btn{flex:1;padding:5px;border-radius:6px;border:1.5px solid var(--gray200);background:var(--white);font-size:11px;font-weight:600;cursor:pointer;transition:all .15s}
+.tier-btn{padding:4px 10px;border-radius:6px;border:1.5px solid var(--gray200);background:var(--white);font-size:11px;font-weight:600;cursor:pointer;transition:all .15s;white-space:nowrap}
 .tier-btn.active{border-color:var(--green);background:var(--green-light);color:var(--green-dark)}
+
+/* ── QB-STYLE POS LAYOUT ── */
+#page-pos.active{display:flex;flex-direction:row;height:100%}
+/* Left action sidebar */
+.qb-sidebar{width:158px;background:#1a3354;display:flex;flex-direction:column;gap:3px;padding:8px 6px;flex-shrink:0;overflow-y:auto}
+.qb-sb-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px 6px 8px;background:#234778;border:1px solid rgba(255,255,255,.08);border-radius:6px;color:#d0e4f7;font-size:11px;font-weight:600;cursor:pointer;text-align:center;line-height:1.3;transition:all .15s;gap:3px}
+.qb-sb-btn:hover{background:#2d5a96;color:#fff;border-color:rgba(255,255,255,.2)}
+.qb-sb-btn.active{background:#2563eb;color:#fff;border-color:#60a5fa}
+.qb-sb-icon{font-size:18px;line-height:1}
+.qb-sb-sep{height:1px;background:rgba(255,255,255,.12);margin:3px 0;flex-shrink:0}
+.qb-sb-count{font-size:10px;background:rgba(255,255,255,.15);border-radius:10px;padding:1px 6px;margin-top:1px}
+/* Main area */
+.qb-main{flex:1;display:flex;flex-direction:column;overflow:hidden;background:var(--gray100)}
+/* Top bar */
+.qb-topbar{display:flex;gap:8px;padding:8px 12px;background:#fff;border-bottom:2px solid #1a3354;align-items:center;flex-shrink:0}
+/* Tier + held bar row */
+.qb-tier-bar{display:flex;gap:6px;padding:5px 12px;background:var(--gray50);border-bottom:1px solid var(--gray200);align-items:center;flex-shrink:0}
+.qb-tier-label{font-size:10px;font-weight:700;color:var(--gray400);text-transform:uppercase;white-space:nowrap;margin-right:2px}
+/* Quick Pick panel */
+.qb-picks-panel{background:#fff;border-bottom:2px solid var(--gray200);overflow:hidden;transition:max-height .2s;flex-shrink:0}
+.qb-picks-panel.open{max-height:280px;display:flex;flex-direction:column}
+.qb-picks-panel.closed{max-height:0;display:none}
+.qb-picks-inner{display:flex;flex-direction:column;gap:6px;padding:6px 12px 8px;overflow:hidden;flex:1}
+.qb-picks-inner .pos-category-bar{flex-shrink:0}
+.qb-picks-inner .product-grid{flex:1;overflow-y:auto;min-height:0;max-height:180px}
+/* Cart table area */
+.qb-cart-wrap{flex:1;overflow-y:auto;min-height:0;background:#fff}
+.qb-cart-table{width:100%;border-collapse:collapse;font-size:13px}
+.qb-cart-table thead tr{background:#1a3354}
+.qb-cart-table th{padding:8px 12px;text-align:left;font-size:11px;font-weight:600;color:#c8daf0;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap;position:sticky;top:0;z-index:1}
+.qb-cart-table td{padding:10px 12px;border-bottom:1px solid var(--gray100);vertical-align:middle}
+.qb-cart-table tbody tr:last-child td{border-bottom:none}
+.qb-cart-table tbody tr:hover td{background:var(--gray50)}
+.qb-cart-table tbody tr.row-selected td{background:#e8f5e9}
+.qb-row-actions{display:flex;gap:4px}
+.qb-row-btn{padding:3px 8px;font-size:11px;font-weight:600;border-radius:4px;border:1px solid var(--gray300);background:#fff;cursor:pointer;white-space:nowrap;transition:all .12s}
+.qb-row-btn:hover{background:var(--gray100)}
+.qb-row-btn.danger{color:var(--red);border-color:#fca5a5}.qb-row-btn.danger:hover{background:var(--red-light)}
+/* QB Footer */
+.qb-footer{background:#fff;border-top:2px solid #1a3354;flex-shrink:0;padding:8px 14px 10px}
+.qb-summary-bar{display:flex;align-items:flex-end;gap:0;padding-bottom:8px;border-bottom:1px solid var(--gray200);margin-bottom:8px}
+.qb-summary-item{display:flex;flex-direction:column;align-items:flex-end;padding:0 14px 0 0;border-right:1px solid var(--gray200);margin-right:14px}
+.qb-summary-item:first-child{padding-left:0}
+.qb-summary-item.total-item{border-right:none;margin-right:0;padding-right:0;margin-left:auto}
+.qb-summary-label{font-size:10px;color:var(--gray500);font-weight:600;text-transform:uppercase;white-space:nowrap}
+.qb-summary-val{font-size:14px;font-weight:700;color:var(--gray800);white-space:nowrap}
+.qb-payment-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.qb-pay-btn{padding:9px 14px;border-radius:6px;font-weight:700;font-size:13px;border:1.5px solid var(--gray300);background:#fff;cursor:pointer;transition:all .15s;white-space:nowrap}
+.qb-pay-btn.active{background:#1a3354;color:#fff;border-color:#1a3354}
+.qb-pay-btn:hover:not(.active){background:var(--gray100);border-color:var(--gray400)}
+.qb-amount-due{margin-left:auto;text-align:right;padding-left:16px;border-left:2px solid var(--gray200)}
+.qb-amount-label{font-size:10px;font-weight:700;color:var(--gray500);text-transform:uppercase}
+.qb-amount-val{font-size:22px;font-weight:800;color:var(--red);line-height:1.1}
+.qb-charge-btn{flex:1;padding:11px 16px;background:#1a3354;color:#fff;border:none;border-radius:6px;font-size:15px;font-weight:700;cursor:pointer;transition:all .15s}
+.qb-charge-btn:hover:not(:disabled){background:#234778}
+.qb-charge-btn:disabled{opacity:.4;cursor:not-allowed;background:var(--gray400)}
+.qb-hold-only-btn{padding:11px 14px;background:#fff;color:var(--gray700);border:1.5px solid var(--gray300);border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;white-space:nowrap}
+.qb-hold-only-btn:hover:not(:disabled){background:var(--gray100)}
+.qb-hold-only-btn:disabled{opacity:.4;cursor:not-allowed}
 
 /* ── RETURNS ── */
 .return-badge{padding:2px 8px;border-radius:9999px;font-size:11px;font-weight:600}
@@ -853,70 +912,142 @@ th.sort-asc .sort-icon,th.sort-desc .sort-icon{opacity:1;color:var(--green)}
           <button class="pos-mob-tab active" data-tab="products" onclick="switchPosTab('products')">🛍 Products</button>
           <button class="pos-mob-tab" data-tab="cart" onclick="switchPosTab('cart')">🛒 Cart <span class="mob-cart-badge" id="mob-cart-badge">0</span></button>
         </div>
-        <div class="pos-products mob-active">
-          <div class="pos-search">
-            <div class="input-group" style="flex:1">
-              <span class="input-icon">🔍</span>
-              <input class="form-control" id="pos-search" placeholder="Search products by name or SKU…" oninput="renderProductGrid()">
-            </div>
-            <button class="scan-btn" onclick="openBarcodeScanner()" title="Scan Barcode">📷 Scan</button>
-          </div>
-          <!-- Pricing tier -->
-          <div class="pricing-tier-bar">
-            <button class="tier-btn active" id="tier-retail" onclick="setPricingTier('retail')">🏷 Retail Price</button>
-            <button class="tier-btn" id="tier-wholesale" onclick="setPricingTier('wholesale')">🏢 Wholesale / Institutional</button>
-            <button class="tier-btn" id="tier-transfer" onclick="setPricingTier('transfer')">🔄 Branch Transfer</button>
-          </div>
-          <div class="pos-category-bar" id="pos-cats"></div>
-          <div class="product-grid" id="product-grid"></div>
+
+        <!-- ── QB-style sidebar ── -->
+        <div class="qb-sidebar" id="qb-sidebar">
+          <button class="qb-sb-btn" id="qb-quickpick-btn" onclick="toggleQuickPick()">
+            <span class="qb-sb-icon">🛍</span>Quick Pick Items
+          </button>
+          <button class="qb-sb-btn" onclick="qbGiveDiscount()">
+            <span class="qb-sb-icon">🏷</span>Give Discount
+          </button>
+          <div class="qb-sb-sep"></div>
+          <button class="qb-sb-btn" id="qb-hold-sb-btn" onclick="holdSale()">
+            <span class="qb-sb-icon">⏸</span>Hold Sale
+            <span class="qb-sb-count hidden" id="held-bar-count-sb">0</span>
+          </button>
+          <button class="qb-sb-btn" onclick="navigate('returns')">
+            <span class="qb-sb-icon">↩</span>Accept Return
+          </button>
+          <div class="qb-sb-sep"></div>
+          <button class="qb-sb-btn" onclick="logout()">
+            <span class="qb-sb-icon">👤</span>Switch Cashier
+          </button>
+          <button class="qb-sb-btn" onclick="navigate('inventory')">
+            <span class="qb-sb-icon">📦</span>View Inventory
+          </button>
+          <!-- hidden cart-count for JS compat -->
+          <span id="cart-count" style="display:none">0 items</span>
         </div>
-        <div class="pos-cart">
-          <div class="cart-header">
-            <span>🛒 Cart</span>
-            <span id="cart-count" class="badge badge-green">0 items</span>
+
+        <!-- ── QB-style main panel ── -->
+        <div class="qb-main">
+
+          <!-- Top bar: search + customer -->
+          <div class="qb-topbar">
+            <div style="display:flex;gap:8px;flex:2;align-items:center">
+              <div class="input-group" style="flex:1">
+                <span class="input-icon">🔍</span>
+                <input class="form-control" id="pos-search" placeholder="Scan or enter item name / SKU…" oninput="renderProductGrid()" style="font-size:14px">
+              </div>
+              <button class="scan-btn" onclick="openBarcodeScanner()" title="Scan Barcode">📷 Scan</button>
+            </div>
+            <div style="flex:1;min-width:0">
+              <select class="form-control" id="pos-customer-select" onchange="onPOSCustomerChange()" style="font-size:13px">
+                <option value="">👤 Walk-in / No Account</option>
+              </select>
+              <div id="pos-credit-info" class="hidden" style="margin-top:4px;font-size:12px"></div>
+            </div>
           </div>
-          <!-- Held sales bar -->
-          <div id="held-bar" class="held-bar" onclick="toggleHeldDrawer()" style="display:none">
-            <span>⏸</span>
-            <span class="held-bar-count" id="held-bar-count">0</span>
-            <span>held sale(s) — tap to view</span>
-            <span style="margin-left:auto;color:var(--gray400)" id="held-bar-chevron">▾</span>
+
+          <!-- Tier + held bar row -->
+          <div class="qb-tier-bar">
+            <span class="qb-tier-label">Price Tier:</span>
+            <button class="tier-btn active" id="tier-retail" onclick="setPricingTier('retail')">🏷 Retail</button>
+            <button class="tier-btn" id="tier-wholesale" onclick="setPricingTier('wholesale')">🏢 Wholesale</button>
+            <button class="tier-btn" id="tier-transfer" onclick="setPricingTier('transfer')">🔄 Transfer</button>
+            <div id="held-bar" class="held-bar" onclick="toggleHeldDrawer()" style="display:none;margin-left:auto;border:none;background:none;padding:0">
+              <span>⏸</span><span class="held-bar-count" id="held-bar-count">0</span>
+              <span>held</span><span id="held-bar-chevron">▾</span>
+            </div>
           </div>
           <div class="held-drawer closed" id="held-drawer"></div>
-          <div class="cart-items" id="cart-items">
-            <div class="empty-state" style="padding:32px 16px">
-              <div class="empty-icon">🛒</div>
-              <p>Cart is empty</p>
-              <span>Click products to add them</span>
+
+          <!-- Quick Pick panel (collapsible) -->
+          <div class="qb-picks-panel closed" id="qb-picks-panel">
+            <div class="qb-picks-inner">
+              <div class="pos-category-bar" id="pos-cats"></div>
+              <div class="product-grid" id="product-grid"></div>
             </div>
           </div>
-          <div class="cart-footer">
-            <div class="cart-totals">
-              <div class="cart-row"><span>Subtotal</span><span id="cart-subtotal">KES 0</span></div>
-              <div class="cart-discount-row cart-row" id="cart-discount-row" style="display:none;color:var(--red)"><span>Discount</span><span></span></div>
-              <div class="cart-row"><span>Tax (16% VAT)</span><span id="cart-tax">KES 0</span></div>
-              <div class="cart-total-row"><span>TOTAL</span><span id="cart-total">KES 0</span></div>
-            </div>
-            <!-- Customer Selector -->
-            <div class="pos-customer-section">
-              <div style="font-size:11px;font-weight:700;color:var(--gray500);text-transform:uppercase;margin-bottom:5px">Customer Account</div>
-              <select class="form-control" id="pos-customer-select" onchange="onPOSCustomerChange()" style="font-size:13px">
-                <option value="">Walk-in / No Account</option>
-              </select>
-              <div id="pos-credit-info" class="hidden" style="margin-top:6px"></div>
-            </div>
-            <!-- Payment Method -->
-            <div style="margin-bottom:8px">
-              <div style="font-size:11px;font-weight:700;color:var(--gray500);text-transform:uppercase;margin-bottom:5px">Payment Method</div>
-              <div class="payment-methods">
-                <button class="pay-btn active" data-method="cash" onclick="selectPayment('cash')">💵 Cash</button>
-                <button class="pay-btn" data-method="mpesa" onclick="selectPayment('mpesa')">📱 M-Pesa</button>
-                <button class="pay-btn" data-method="creditpartial" onclick="selectPayment('creditpartial')" style="grid-column:1/-1">📒 Credit / Partial</button>
+
+          <!-- Receipt / Cart table -->
+          <div class="qb-cart-wrap">
+            <table class="qb-cart-table">
+              <thead>
+                <tr>
+                  <th style="width:32px">#</th>
+                  <th>Item Name</th>
+                  <th style="width:130px;text-align:center">Qty</th>
+                  <th style="width:110px;text-align:right">Price</th>
+                  <th style="width:120px;text-align:right">Ext. Price</th>
+                  <th style="width:170px;text-align:center">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="cart-items">
+                <tr><td colspan="6" style="text-align:center;padding:40px;color:var(--gray400)">
+                  <div style="font-size:32px;margin-bottom:8px">🛒</div>
+                  <div style="font-size:14px;font-weight:600">No items on this receipt</div>
+                  <div style="font-size:12px;margin-top:4px">Search for a product above or use Quick Pick</div>
+                </td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Footer: summary + payment -->
+          <div class="qb-footer">
+            <!-- QB-style summary stats -->
+            <div class="qb-summary-bar">
+              <div class="qb-summary-item">
+                <span class="qb-summary-label">No. of Items</span>
+                <span class="qb-summary-val" id="qb-item-count">0</span>
+              </div>
+              <div class="qb-summary-item">
+                <span class="qb-summary-label">Total Qty</span>
+                <span class="qb-summary-val" id="qb-total-qty">0</span>
+              </div>
+              <div class="qb-summary-item">
+                <span class="qb-summary-label">SubTotal</span>
+                <span class="qb-summary-val" id="cart-subtotal">KES 0</span>
+              </div>
+              <div class="qb-summary-item" id="cart-discount-row" style="display:none">
+                <span class="qb-summary-label" style="color:var(--red)">Discount</span>
+                <span class="qb-summary-val" style="color:var(--red)"></span>
+              </div>
+              <div class="qb-summary-item">
+                <span class="qb-summary-label">Tax</span>
+                <span class="qb-summary-val" id="cart-tax">KES 0</span>
+              </div>
+              <div class="qb-summary-item total-item">
+                <span class="qb-summary-label" style="font-size:11px">Total</span>
+                <span class="qb-summary-val" id="cart-total" style="font-size:20px;font-weight:800;color:var(--gray900)">KES 0</span>
               </div>
             </div>
-            <!-- Credit / Partial combined section -->
-            <div id="credit-partial-section" class="partial-section hidden">
-              <div style="display:flex;gap:6px;margin-bottom:8px">
+
+            <!-- Payment row -->
+            <div class="qb-payment-row">
+              <button class="qb-pay-btn active" data-method="cash" onclick="selectPayment('cash')">💵 Cash</button>
+              <button class="qb-pay-btn" data-method="mpesa" onclick="selectPayment('mpesa')">📱 M-Pesa</button>
+              <button class="qb-pay-btn" data-method="creditpartial" onclick="selectPayment('creditpartial')">📒 Account</button>
+              <div class="qb-amount-due">
+                <div class="qb-amount-label">Amount Due</div>
+                <div class="qb-amount-val" id="qb-amount-due">KES 0</div>
+              </div>
+            </div>
+
+            <!-- Credit/Partial sub-panel -->
+            <div id="credit-partial-section" class="partial-section hidden" style="margin-bottom:6px">
+              <div style="display:flex;gap:6px;margin-bottom:6px">
                 <button class="cp-type-btn active" id="cp-full-btn" onclick="selectCreditType('credit')">📒 Full Credit</button>
                 <button class="cp-type-btn" id="cp-part-btn" onclick="selectCreditType('partial')">⚖️ Partial Payment</button>
               </div>
@@ -926,12 +1057,15 @@ th.sort-asc .sort-icon,th.sort-desc .sort-icon{opacity:1;color:var(--green)}
                 <div id="partial-balance-display" style="margin-top:5px;font-size:12px;color:var(--gray600)"></div>
               </div>
             </div>
-            <button class="checkout-btn" id="checkout-btn" onclick="checkout()" disabled>
-              Charge — KES 0
-            </button>
-            <button class="hold-btn" id="hold-btn" onclick="holdSale()" disabled>⏸ Hold Sale</button>
+
+            <!-- Charge + Hold buttons -->
+            <div style="display:flex;gap:8px">
+              <button class="qb-charge-btn" id="checkout-btn" onclick="checkout()" disabled>⚡ Charge — KES 0</button>
+              <button class="qb-hold-only-btn" id="hold-btn" onclick="holdSale()" disabled>⏸ Hold</button>
+            </div>
           </div>
-        </div>
+
+        </div><!-- /qb-main -->
       </div>
 
       <!-- ══ PAGE: INVENTORY ══ -->
@@ -1708,6 +1842,7 @@ th.sort-asc .sort-icon,th.sort-desc .sort-icon{opacity:1;color:var(--green)}
     <div class="modal-footer" style="flex-wrap:wrap;gap:8px">
       <button class="btn btn-secondary" onclick="closeModal('receipt-modal-overlay')">Close</button>
       <button class="btn btn-secondary" onclick="printReceipt()">🖨 Print</button>
+      <button class="btn btn-secondary" onclick="downloadReceiptPDF()" style="background:#e65c00;color:#fff;border-color:#e65c00">📄 PDF</button>
       <button class="btn btn-secondary" onclick="shareInvoiceWhatsApp()" style="background:#25D366;color:#fff;border-color:#25D366">💬 WhatsApp</button>
       <button class="btn btn-secondary" onclick="shareInvoiceEmail()" style="background:#1a73e8;color:#fff;border-color:#1a73e8">✉ Email</button>
       <button class="btn btn-primary" onclick="newSale()">New Sale</button>
@@ -1881,6 +2016,23 @@ th.sort-asc .sort-icon,th.sort-desc .sort-icon{opacity:1;color:var(--green)}
     <div class="modal-footer">
       <button class="btn btn-secondary" onclick="closeModal('payment-modal-overlay')">Cancel</button>
       <button class="btn btn-primary" onclick="savePayment()">Record Payment</button>
+    </div>
+  </div>
+</div>
+
+<!-- Document Viewer Modal (GRN / Return details from bin card) -->
+<div class="modal-overlay hidden" id="docview-modal-overlay">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <div>
+        <h3 id="docview-title">Document</h3>
+        <p id="docview-subtitle" style="font-size:12px;color:var(--gray400);margin-top:2px"></p>
+      </div>
+      <button class="modal-close" onclick="closeModal('docview-modal-overlay')">✕</button>
+    </div>
+    <div class="modal-body" id="docview-body" style="padding:20px"></div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('docview-modal-overlay')">Close</button>
     </div>
   </div>
 </div>
@@ -3315,7 +3467,7 @@ function holdSale(){
   document.getElementById('pos-customer-select').value='';
   document.getElementById('pos-credit-info').classList.add('hidden');
   document.getElementById('credit-partial-section').classList.add('hidden');
-  document.querySelector('.pay-btn[data-method="cash"]').click();
+  document.querySelector('.qb-pay-btn[data-method="cash"]').click();
   renderCart();
   renderHeldBar();
   toast('Sale held — cart cleared','success');
@@ -3398,42 +3550,48 @@ function renderCart(){
   const settings=DB.get('settings')||{vatRate:16,vatEnabled:true};
   const vatRate=(settings.vatEnabled?(settings.vatRate||16):0)/100;
   const subtotal=cart.reduce((a,i)=>a+i.qty*i.sellPrice,0);
-  const totalDiscount=cart.reduce((a,i)=>{
-    const orig=i.originalPrice||i.sellPrice;
-    return a+(orig-i.sellPrice)*i.qty;
-  },0);
+  const totalDiscount=cart.reduce((a,i)=>{const orig=i.originalPrice||i.sellPrice;return a+(orig-i.sellPrice)*i.qty;},0);
   const tax=subtotal*vatRate;
   const total=subtotal+tax;
+  const totalQty=cart.reduce((a,i)=>a+i.qty,0);
+  // Update counts
   document.getElementById('cart-count').textContent=cart.length+' item'+(cart.length!==1?'s':'');
-  // Update mobile cart badge
   const badge=document.getElementById('mob-cart-badge');
   if(badge){badge.textContent=cart.length;badge.classList.toggle('has-items',cart.length>0);}
+  // QB summary bar
+  const iqEl=document.getElementById('qb-item-count');if(iqEl)iqEl.textContent=cart.length;
+  const tqEl=document.getElementById('qb-total-qty');if(tqEl)tqEl.textContent=totalQty;
+  const adEl=document.getElementById('qb-amount-due');if(adEl)adEl.textContent=kes(total);
+  // Totals
   document.getElementById('cart-subtotal').textContent=kes(subtotal);
   document.getElementById('cart-tax').textContent=kes(tax);
   document.getElementById('cart-total').textContent=kes(total);
-  document.getElementById('checkout-btn').textContent=`Charge — ${kes(total)}`;
+  document.getElementById('checkout-btn').textContent=`⚡ Charge — ${kes(total)}`;
   document.getElementById('checkout-btn').disabled=cart.length===0;
   document.getElementById('hold-btn').disabled=cart.length===0;
-  // Discount row in totals
+  // Discount row
   const discRow=document.getElementById('cart-discount-row');
-  if(discRow){discRow.style.display=totalDiscount>0?'flex':'none';discRow.querySelector('span:last-child').textContent=`−${kes(totalDiscount)}`;}
+  if(discRow){discRow.style.display=totalDiscount>0?'flex':'none';const s=discRow.querySelector('span:last-child');if(s)s.textContent=`−${kes(totalDiscount)}`;}
+  // Render table rows
   const el=document.getElementById('cart-items');
-  if(!cart.length){el.innerHTML=`<div class="empty-state" style="padding:32px 16px"><div class="empty-icon">🛒</div><p>Cart is empty</p><span>Click products to add them</span></div>`;return;}
+  if(!cart.length){
+    el.innerHTML=`<tr><td colspan="6" style="text-align:center;padding:40px;color:var(--gray400)">
+      <div style="font-size:32px;margin-bottom:8px">🛒</div>
+      <div style="font-size:14px;font-weight:600">No items on this receipt</div>
+      <div style="font-size:12px;margin-top:4px">Search for a product above or use Quick Pick</div>
+    </td></tr>`;
+    return;
+  }
   el.innerHTML=cart.map((i,idx)=>{
     const orig=i.originalPrice||i.sellPrice;
     const isDiscounted=i.sellPrice<orig;
-    const discAmt=(orig-i.sellPrice)*i.qty;
     const discPct=orig>0?Math.round((orig-i.sellPrice)/orig*100):0;
-    return`<div class="cart-item" style="flex-wrap:wrap">
-      <div class="cart-item-info" style="flex:1;min-width:0">
-        <div class="cart-item-name">${i.name}</div>
-        <div class="cart-item-price-row">
-          ${isDiscounted?`<span class="cart-price-original">${kes(orig)}</span>`:''}
-          <span class="cart-price-final">${kes(i.sellPrice)} each</span>
-          ${isDiscounted?`<span class="disc-badge">-${discPct}%</span>`:''}
-          <button onclick="toggleDiscInput(${idx})" title="Adjust price" style="background:none;border:none;cursor:pointer;color:var(--gray400);font-size:13px;padding:0 2px;line-height:1" title="Apply discount">✏️</button>
-        </div>
-        ${i.discountOpen?`<div class="disc-input-row">
+    return`<tr class="qb-cart-row">
+      <td style="color:var(--gray400);font-size:12px;font-weight:600">${idx+1}</td>
+      <td>
+        <div style="font-weight:600;font-size:13px;line-height:1.3">${i.name}</div>
+        ${isDiscounted?`<div style="font-size:11px;color:var(--red);margin-top:2px">🏷 −${discPct}% discount</div>`:''}
+        ${i.discountOpen?`<div class="disc-input-row" style="margin-top:6px">
           <input type="number" id="disc-val-${idx}" value="${isDiscounted?discPct:''}" placeholder="Value" min="0" onkeydown="if(event.key==='Enter')applyDiscount(${idx})">
           <select id="disc-type-${idx}">
             <option value="pct" ${i.discountType!=='fixed'?'selected':''}>% off</option>
@@ -3442,21 +3600,47 @@ function renderCart(){
           <button class="disc-apply-btn" onclick="applyDiscount(${idx})">Apply</button>
           ${isDiscounted?`<button class="disc-clear-btn" onclick="clearDiscount(${idx})">Clear</button>`:''}
         </div>`:''}
-      </div>
-      <div class="qty-ctrl">
-        <button class="qty-btn" onclick="updateQty('${i.productId}',-1)">−</button>
-        <input class="qty-input" type="number" min="1" max="${i.maxStock}" value="${i.qty}" onclick="this.select()" onchange="setCartQty('${i.productId}',this.value)" onkeydown="if(event.key==='Enter'){this.blur();}">
-        <button class="qty-btn" onclick="updateQty('${i.productId}',1)">+</button>
-      </div>
-      <div style="text-align:right;min-width:70px">
-        <div style="font-weight:600;font-size:13px">${kes(i.qty*i.sellPrice)}</div>
-        ${isDiscounted?`<div style="font-size:10px;color:var(--red)">−${kes(discAmt)}</div>`:''}
-      </div>
-      <span class="cart-remove" onclick="removeFromCart('${i.productId}')">✕</span>
-    </div>`;
+      </td>
+      <td style="text-align:center">
+        <div class="qty-ctrl">
+          <button class="qty-btn" onclick="updateQty('${i.productId}',-1)">−</button>
+          <input class="qty-input" type="number" min="1" max="${i.maxStock}" value="${i.qty}" onclick="this.select()" onchange="setCartQty('${i.productId}',this.value)" onkeydown="if(event.key==='Enter'){this.blur();}">
+          <button class="qty-btn" onclick="updateQty('${i.productId}',1)">+</button>
+        </div>
+      </td>
+      <td style="text-align:right">
+        ${isDiscounted?`<div style="font-size:11px;color:var(--gray400);text-decoration:line-through">${kes(orig)}</div>`:''}
+        <div style="font-weight:600">${kes(i.sellPrice)}</div>
+      </td>
+      <td style="text-align:right;font-weight:700;font-size:14px">${kes(i.qty*i.sellPrice)}</td>
+      <td>
+        <div class="qb-row-actions">
+          <button class="qb-row-btn" onclick="toggleDiscInput(${idx})">✏️ Edit</button>
+          <button class="qb-row-btn danger" onclick="removeFromCart('${i.productId}')">✕ Remove</button>
+        </div>
+      </td>
+    </tr>`;
   }).join('');
 }
 
+function toggleQuickPick(){
+  const panel=document.getElementById('qb-picks-panel');
+  const btn=document.getElementById('qb-quickpick-btn');
+  if(!panel) return;
+  const isOpen=panel.classList.contains('open');
+  panel.classList.toggle('open',!isOpen);
+  panel.classList.toggle('closed',isOpen);
+  btn.classList.toggle('active',!isOpen);
+  if(!isOpen){renderProductGrid();setTimeout(()=>{const s=document.getElementById('pos-search');if(s)s.focus();},100);}
+}
+function qbGiveDiscount(){
+  if(!cart.length){toast('Add items to the receipt first','warning');return;}
+  // Open discount editor on first non-discounted item, or first item
+  const idx=cart.findIndex(i=>!i.discountOpen);
+  cart.forEach((c,i)=>c.discountOpen=(i===(idx>=0?idx:0)));
+  renderCart();
+  setTimeout(()=>{const el=document.getElementById('disc-val-'+(idx>=0?idx:0));if(el){el.focus();el.select();}},60);
+}
 function toggleDiscInput(idx){
   cart[idx].discountOpen=!cart[idx].discountOpen;
   renderCart();
@@ -3495,8 +3679,8 @@ function clearDiscount(idx){
 }
 
 function selectPayment(method){
-  document.querySelectorAll('.pay-btn').forEach(b=>b.classList.remove('active'));
-  const btn=document.querySelector(`.pay-btn[data-method="${method}"]`);
+  document.querySelectorAll('.qb-pay-btn').forEach(b=>b.classList.remove('active'));
+  const btn=document.querySelector(`.qb-pay-btn[data-method="${method}"]`);
   if(btn) btn.classList.add('active');
   const cpSection=document.getElementById('credit-partial-section');
   if(method==='creditpartial'){
@@ -3576,7 +3760,7 @@ function checkout(){
     if(p){
       const newStock=p.stock-ci.qty;
       DB.update('products',p.id,{stock:newStock});
-      DB.push('inv_history',{id:uid(),productId:p.id,productName:p.name,type:'sale',qty:-ci.qty,stockAfter:newStock,userId:currentUser.id,userName:currentUser.name,notes:`Sale #${saleId}`,date:now()});
+      DB.push('inv_history',{id:uid(),productId:p.id,productName:p.name,type:'sale',qty:-ci.qty,stockAfter:newStock,userId:currentUser.id,userName:currentUser.name,notes:`Sale #${saleId}`,refId:saleId,date:now()});
     }
   });
   // Record sale
@@ -3594,7 +3778,7 @@ function checkout(){
   document.getElementById('pos-customer-select').value='';
   document.getElementById('pos-credit-info').classList.add('hidden');
   document.getElementById('credit-partial-section').classList.add('hidden');
-  document.querySelectorAll('.pay-btn').forEach(b=>b.classList.toggle('active',b.dataset.method==='cash'));
+  document.querySelectorAll('.qb-pay-btn').forEach(b=>b.classList.toggle('active',b.dataset.method==='cash'));
   renderCart();
   showReceipt(sale);
   renderHeldBar();
@@ -3856,32 +4040,113 @@ function _getInvoiceCustomer(){
   return DB.all('customers').find(c=>c.id===sale.customerId)||null;
 }
 
-function shareInvoiceWhatsApp(){
+/* ── PDF receipt helper ── */
+function _loadHtml2Pdf(){
+  return new Promise((resolve,reject)=>{
+    if(typeof html2pdf!=='undefined'){resolve();return;}
+    const s=document.createElement('script');
+    s.src='https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
+    s.onload=resolve;
+    s.onerror=()=>reject(new Error('Could not load PDF library — check your internet connection'));
+    document.head.appendChild(s);
+  });
+}
+
+async function _generateReceiptPDF(sale){
+  await _loadHtml2Pdf();
+  const settings=DB.get('settings')||{bizName:'NairobiPOS'};
+  const html=buildA4Receipt(sale,settings);
+  // Wrap in a full document so fonts/styles render properly
+  const wrapper=document.createElement('div');
+  wrapper.innerHTML=html;
+  wrapper.style.cssText='font-family:Arial,sans-serif;font-size:12px;color:#000;background:#fff;';
+  document.body.appendChild(wrapper);
+  const filename=`Receipt-INV-${sale.id}.pdf`;
+  const opt={
+    margin:[10,10,10,10],
+    filename,
+    image:{type:'jpeg',quality:0.95},
+    html2canvas:{scale:2,useCORS:true,backgroundColor:'#fff'},
+    jsPDF:{unit:'mm',format:'a4',orientation:'portrait'}
+  };
+  try{
+    const blob=await html2pdf().set(opt).from(wrapper).outputPdf('blob');
+    document.body.removeChild(wrapper);
+    return {blob,filename};
+  }catch(e){
+    if(document.body.contains(wrapper)) document.body.removeChild(wrapper);
+    throw e;
+  }
+}
+
+function _triggerPdfDownload(blob,filename){
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;
+  a.download=filename;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(()=>{document.body.removeChild(a);URL.revokeObjectURL(url);},2000);
+}
+
+async function shareInvoiceWhatsApp(){
   const sale=currentReceiptSale;
   if(!sale) return;
-  const text=buildInvoiceText(sale);
   const c=_getInvoiceCustomer();
   let phone='';
   if(c&&c.phone){
-    phone=(c.phone||'').replace(/[\s\-()]/g,'').replace('+','');
+    phone=(c.phone||'').replace(/[\s\-()]/g,'').replace(/^\+/,'');
   }
-  const url=phone
-    ?`https://wa.me/${phone}?text=${encodeURIComponent(text)}`
-    :`https://wa.me/?text=${encodeURIComponent(text)}`;
-  window.open(url,'_blank');
-  if(!phone) toast('No customer phone on file — WhatsApp opened, pick a contact','warning');
+  toast('Generating PDF receipt…','success');
+  try{
+    const {blob,filename}=await _generateReceiptPDF(sale);
+    _triggerPdfDownload(blob,filename);
+    // WhatsApp Web cannot receive file attachments via URL,
+    // so we download the PDF and open WhatsApp with an instruction message.
+    const settings=DB.get('settings')||{bizName:'NairobiPOS'};
+    const msg=`Hi${c?' '+c.name:''},\n\nPlease find your receipt (${filename}) attached.\n\nThank you for shopping at ${settings.bizName||'NairobiPOS'}!`;
+    const url=phone
+      ?`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`
+      :`https://wa.me/?text=${encodeURIComponent(msg)}`;
+    setTimeout(()=>window.open(url,'_blank'),800);
+    toast('PDF saved — attach it to the WhatsApp chat that just opened','success');
+    if(!phone) toast('No customer phone — WhatsApp opened, pick a contact','warning');
+  }catch(e){
+    toast(e.message||'PDF generation failed','error');
+  }
 }
 
-function shareInvoiceEmail(){
+async function shareInvoiceEmail(){
   const sale=currentReceiptSale;
   if(!sale) return;
   const settings=DB.get('settings')||{bizName:'NairobiPOS'};
-  const text=buildInvoiceText(sale);
   const c=_getInvoiceCustomer();
   const email=(c&&c.email)?c.email:'';
-  const subject=encodeURIComponent(`Invoice from ${settings.bizName||'NairobiPOS'} — Ref ${sale.id}`);
-  window.open(`mailto:${email}?subject=${subject}&body=${encodeURIComponent(text)}`,'_blank');
-  if(!email) toast('No customer email on file — compose window opened','warning');
+  toast('Generating PDF receipt…','success');
+  try{
+    const {blob,filename}=await _generateReceiptPDF(sale);
+    _triggerPdfDownload(blob,filename);
+    const subject=encodeURIComponent(`Receipt from ${settings.bizName||'NairobiPOS'} — INV-${sale.id}`);
+    const body=encodeURIComponent(`Hi${c?' '+c.name:''},\n\nPlease find your receipt attached (${filename}).\n\nThank you for shopping at ${settings.bizName||'NairobiPOS'}!`);
+    setTimeout(()=>window.open(`mailto:${email}?subject=${subject}&body=${body}`,'_blank'),800);
+    toast('PDF saved — attach it to the email that just opened','success');
+    if(!email) toast('No customer email on file — compose window opened','warning');
+  }catch(e){
+    toast(e.message||'PDF generation failed','error');
+  }
+}
+
+async function downloadReceiptPDF(){
+  const sale=currentReceiptSale;
+  if(!sale) return;
+  toast('Generating PDF…','success');
+  try{
+    const {blob,filename}=await _generateReceiptPDF(sale);
+    _triggerPdfDownload(blob,filename);
+    toast(`${filename} downloaded`,'success');
+  }catch(e){
+    toast(e.message||'PDF generation failed','error');
+  }
 }
 
 /* ════════════════════════════════════════════════
@@ -4409,6 +4674,7 @@ function postReceipt(){
       type:'receive',qty:qty,stockAfter:newStock,
       userId:currentUser.id,userName:currentUser.name,
       notes:`Invoice ${invoiceNo}${ln.batchNo?' | Batch: '+ln.batchNo:''}${ln.expiry?' | Exp: '+ln.expiry:''}`,
+      refId:receiptId,
       date:ts
     });
     items.push({
@@ -6034,18 +6300,56 @@ function showBinCard(productId){
   const typeLabel={sale:'Issued / Sold',purchase:'Received',receive:'Received',adjustment:'Adjustment',return:'Customer Return',damage:'Damage/Loss'};
   const typeColor={sale:'badge-red',purchase:'badge-green',receive:'badge-green',adjustment:'badge-blue',return:'badge-green',damage:'badge-red'};
 
+  // Pre-load lookup tables once for reference linking
+  const _sales=DB.all('sales');
+  const _receipts=DB.all('receipts');
+  const _returns=DB.all('returns');
+
   tbody.innerHTML=hist.map((h,i)=>{
     const isIn=h.qty>0;
-    const ref=h.notes||'—';
+    const notes=h.notes||'';
+
+    // Build clickable reference cell for linkable document types
+    let refCell=notes||'—';
+    if(h.type==='sale'){
+      let saleId=h.refId;
+      if(!saleId){const m=notes.match(/Sale #(\S+)/);if(m) saleId=m[1];}
+      if(saleId&&_sales.some(s=>s.id===saleId)){
+        refCell=`<button onclick="viewBincardDocument('sale','${saleId}','')" style="background:none;border:none;color:var(--blue);text-decoration:underline;cursor:pointer;font-size:12px;padding:0;text-align:left;font-weight:600">Sale #${saleId.slice(-6).toUpperCase()} ↗</button>`;
+      }
+    } else if(h.type==='receive'){
+      let receiptId=h.refId;
+      let label=notes;
+      if(receiptId&&_receipts.some(r=>r.id===receiptId)){
+        refCell=`<button onclick="viewBincardDocument('receive','${receiptId}','')" style="background:none;border:none;color:var(--blue);text-decoration:underline;cursor:pointer;font-size:12px;padding:0;text-align:left;font-weight:600">${label||'View GRN'} ↗</button>`;
+      } else {
+        // Old records without refId — match by invoiceNo in notes
+        const m=notes.match(/^Invoice ([^\|]+)/);
+        if(m){
+          const invNo=m[1].trim();
+          const rec=_receipts.find(r=>r.invoiceNo===invNo);
+          if(rec){
+            refCell=`<button onclick="viewBincardDocument('receive','${rec.id}','')" style="background:none;border:none;color:var(--blue);text-decoration:underline;cursor:pointer;font-size:12px;padding:0;text-align:left;font-weight:600">${label||'View GRN'} ↗</button>`;
+          }
+        }
+      }
+    } else if(h.type==='return'){
+      let retId=h.refId;
+      if(!retId){const m=notes.match(/Return #(\S+)/);if(m) retId=m[1];}
+      if(retId&&_returns.some(r=>r.id===retId)){
+        refCell=`<button onclick="viewBincardDocument('return','${retId}','')" style="background:none;border:none;color:var(--blue);text-decoration:underline;cursor:pointer;font-size:12px;padding:0;text-align:left;font-weight:600">${notes||'View Return'} ↗</button>`;
+      }
+    }
+
     return`<tr style="${i===hist.length-1?'background:var(--green-light)':''}">
       <td style="font-size:12px;white-space:nowrap">${fmt(h.date)}</td>
-      <td style="font-size:12px">${ref}</td>
+      <td style="font-size:12px">${refCell}</td>
       <td><span class="badge ${typeColor[h.type]||'badge-gray'}">${typeLabel[h.type]||h.type}</span></td>
       <td style="text-align:right;font-weight:700;color:var(--green)">${isIn?'+'+h.qty:'—'}</td>
       <td style="text-align:right;font-weight:700;color:var(--red)">${!isIn?Math.abs(h.qty):'—'}</td>
       <td style="text-align:right;font-weight:700;font-size:15px">${h.stockAfter}</td>
       <td style="font-size:12px">${h.userName||'—'}</td>
-      <td style="font-size:12px;color:var(--gray500)">${h.notes||'—'}</td>
+      <td style="font-size:12px;color:var(--gray500)">${notes||'—'}</td>
     </tr>`;
   }).join('');
 
@@ -6061,6 +6365,96 @@ function showBinCard(productId){
   </tr>`;
 
   openModal('bincard-modal-overlay');
+}
+
+function viewBincardDocument(type, refId){
+  if(type==='sale'){
+    const sale=DB.all('sales').find(s=>s.id===refId);
+    if(!sale){toast('Sale record not found','error');return;}
+    // Open receipt over the bin card (user can close receipt to return)
+    showReceipt(sale);
+    return;
+  }
+  if(type==='receive'){
+    const rec=DB.all('receipts').find(r=>r.id===refId);
+    if(!rec){toast('Receiving record not found','error');return;}
+    _viewGRN(rec);
+    return;
+  }
+  if(type==='return'){
+    const ret=DB.all('returns').find(r=>r.id===refId);
+    if(!ret){toast('Return record not found','error');return;}
+    _viewReturn(ret);
+    return;
+  }
+}
+
+function _viewGRN(rec){
+  document.getElementById('docview-title').textContent=`GRN — Invoice ${rec.invoiceNo}`;
+  document.getElementById('docview-subtitle').textContent=`${rec.supplierName||'Unknown Supplier'} · ${rec.date||''} · Posted by ${rec.postedBy||'—'}`;
+  const rows=(rec.items||[]).map(it=>`
+    <tr>
+      <td>${it.productName||'—'}</td>
+      <td style="text-align:center">${it.qty}</td>
+      <td style="text-align:right">${kes(it.unitCost)}</td>
+      <td style="text-align:right;font-weight:700">${kes(it.lineTotal)}</td>
+      <td style="font-size:11px;color:var(--gray500)">${it.batchNo||'—'}</td>
+      <td style="font-size:11px;color:var(--gray500)">${it.expiry||'—'}</td>
+    </tr>`).join('');
+  const total=kes(rec.total||0);
+  document.getElementById('docview-body').innerHTML=`
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Product</th><th style="text-align:center">Qty</th>
+            <th style="text-align:right">Unit Cost</th><th style="text-align:right">Line Total</th>
+            <th>Batch</th><th>Expiry</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+        <tfoot>
+          <tr style="background:var(--gray50);font-weight:700;border-top:2px solid var(--gray200)">
+            <td colspan="3" style="text-align:right">TOTAL</td>
+            <td style="text-align:right">${total}</td>
+            <td colspan="2"></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+    ${rec.notes?`<p style="margin-top:12px;font-size:12px;color:var(--gray500)"><strong>Notes:</strong> ${rec.notes}</p>`:''}`;
+  openModal('docview-modal-overlay');
+}
+
+function _viewReturn(ret){
+  document.getElementById('docview-title').textContent=`Return — ${ret.customerName||'Walk-in'}`;
+  document.getElementById('docview-subtitle').textContent=`${fmt(ret.date)} · Refund: ${kes(ret.refundAmount)} via ${ret.method||'—'} · Processed by ${ret.processedBy||'—'}`;
+  const rows=(ret.items||[]).map(it=>`
+    <tr>
+      <td>${it.productName||'—'}</td>
+      <td style="text-align:center">${it.qty}</td>
+      <td style="text-align:right">${kes(it.sellPrice||it.unitPrice||0)}</td>
+      <td style="text-align:right;font-weight:700">${kes((it.sellPrice||it.unitPrice||0)*it.qty)}</td>
+    </tr>`).join('');
+  document.getElementById('docview-body').innerHTML=`
+    ${ret.reason?`<div style="margin-bottom:12px;padding:8px 12px;background:var(--amber-light,#fff8e1);border-left:3px solid var(--amber);border-radius:4px;font-size:13px"><strong>Reason:</strong> ${ret.reason}</div>`:''}
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Product</th><th style="text-align:center">Qty Returned</th><th style="text-align:right">Unit Price</th><th style="text-align:right">Subtotal</th></tr>
+        </thead>
+        <tbody>${rows}</tbody>
+        <tfoot>
+          <tr style="background:var(--gray50);font-weight:700;border-top:2px solid var(--gray200)">
+            <td colspan="3" style="text-align:right">REFUND TOTAL</td>
+            <td style="text-align:right;color:var(--red)">${kes(ret.refundAmount)}</td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+    ${ret.notes?`<p style="margin-top:12px;font-size:12px;color:var(--gray500)"><strong>Notes:</strong> ${ret.notes}</p>`:''}
+    ${ret.originalSaleId?`<p style="margin-top:8px;font-size:12px;color:var(--gray500)">Original sale: <strong>${ret.originalSaleId}</strong></p>`:''}`;
+  openModal('docview-modal-overlay');
 }
 
 /* ════════════════════════════════════════════════
@@ -6389,7 +6783,7 @@ function saveReturn(){
     if(p){
       const newStock=p.stock+ri.qty;
       DB.update('products',p.id,{stock:newStock});
-      DB.push('inv_history',{id:uid(),productId:p.id,productName:p.name,type:'return',qty:ri.qty,stockAfter:newStock,userId:currentUser.id,userName:currentUser.name,notes:`Return #${ret.id}`,date:now()});
+      DB.push('inv_history',{id:uid(),productId:p.id,productName:p.name,type:'return',qty:ri.qty,stockAfter:newStock,userId:currentUser.id,userName:currentUser.name,notes:`Return #${ret.id}`,refId:ret.id,date:now()});
     }
   });
   // Credit customer account if applicable
@@ -7666,5 +8060,6 @@ if(navigator.onLine){
 }
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </body>
 </html>
