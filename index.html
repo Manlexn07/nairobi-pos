@@ -532,6 +532,80 @@ th.sort-asc .sort-icon,th.sort-desc .sort-icon{opacity:1;color:var(--green)}
   .qb-picks-inner .product-grid{max-height:140px}
 }
 
+/* ── RECEIVING MODULE — QB STYLE ── */
+#page-receiving{display:none;height:100%}
+#page-receiving.active{display:flex;flex-direction:column;height:100%}
+.content.recv-active{padding:0!important;overflow:hidden!important;}
+/* Tab bar */
+.recv-tabs{display:flex;background:#1a3354;flex-shrink:0}
+.recv-tab{padding:10px 22px;color:#c8daf0;font-size:13px;font-weight:600;cursor:pointer;border-bottom:3px solid transparent;transition:all .15s;white-space:nowrap}
+.recv-tab.active{color:#fff;border-bottom-color:#60a5fa;background:rgba(255,255,255,.09)}
+.recv-tab:hover:not(.active){color:#fff;background:rgba(255,255,255,.06)}
+/* Tab panels */
+.recv-tab-panel{display:none;flex:1;flex-direction:column;overflow:hidden;min-height:0}
+.recv-tab-panel.active{display:flex}
+/* Held receivings strip */
+.recv-held-strip{padding:6px 16px 0;background:var(--gray50);border-bottom:1px solid #fde68a;flex-shrink:0}
+.recv-held-strip .held-recv-card{margin-bottom:6px}
+/* Topbar with document fields */
+.recv-topbar{display:flex;gap:12px;padding:10px 16px;background:#fff;border-bottom:2px solid #1a3354;align-items:flex-end;flex-shrink:0;flex-wrap:wrap}
+.recv-field-grp{display:flex;flex-direction:column;gap:3px;flex:1;min-width:140px}
+.recv-field-label{font-size:10px;font-weight:700;color:var(--gray500);text-transform:uppercase;letter-spacing:.04em}
+/* Action bar */
+.recv-action-bar{display:flex;gap:8px;padding:6px 12px;background:var(--gray50);border-bottom:1px solid var(--gray200);align-items:center;flex-shrink:0;flex-wrap:wrap}
+/* Receiving product search */
+.recv-search-wrap{position:relative;flex:1;min-width:200px;max-width:500px}
+.recv-search-dropdown{position:absolute;top:100%;left:0;right:0;z-index:300;background:#fff;border:1.5px solid #1a3354;border-top:none;border-radius:0 0 8px 8px;box-shadow:0 8px 24px rgba(0,0,0,.15);max-height:300px;overflow-y:auto;display:none}
+.recv-search-dropdown.open{display:block}
+.recv-sd-item{display:flex;align-items:center;gap:10px;padding:9px 14px;cursor:pointer;border-bottom:1px solid var(--gray100);transition:background .1s}
+.recv-sd-item:last-child{border-bottom:none}
+.recv-sd-item:hover,.recv-sd-item.focused{background:#e8f0fe}
+.recv-sd-left{flex:1;min-width:0}
+.recv-sd-name{font-weight:600;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.recv-sd-meta{font-size:11px;color:var(--gray500);margin-top:1px}
+.recv-sd-right{text-align:right;flex-shrink:0}
+.recv-sd-cost{font-weight:700;color:#1a3354;font-size:13px}
+/* Line items table */
+.recv-table-wrap{flex:1;overflow:auto;min-height:0;background:#fff}
+.recv-table{width:100%;border-collapse:collapse;font-size:13px;min-width:620px}
+.recv-table thead tr{background:#1a3354}
+.recv-table th{padding:8px 10px;text-align:left;font-size:11px;font-weight:600;color:#c8daf0;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap;position:sticky;top:0;z-index:1}
+.recv-table td{padding:7px 10px;border-bottom:1px solid var(--gray100);vertical-align:middle}
+.recv-table tbody tr:last-child td{border-bottom:none}
+.recv-table tbody tr:hover td{background:var(--gray50)}
+.recv-table input,.recv-table select{width:100%;padding:5px 8px;border:1.5px solid var(--gray200);border-radius:5px;font-size:12px;background:#fff;box-sizing:border-box;transition:border-color .12s}
+.recv-table input:focus,.recv-table select:focus{border-color:#1a3354;outline:none;box-shadow:0 0 0 2px rgba(26,51,84,.1)}
+.recv-prod-wrap{position:relative}
+.recv-prod-drop{position:absolute;top:100%;left:0;right:0;z-index:200;background:#fff;border:1.5px solid #1a3354;border-top:none;border-radius:0 0 6px 6px;box-shadow:0 6px 18px rgba(0,0,0,.14);max-height:200px;overflow-y:auto;display:none}
+.recv-prod-drop.open{display:block}
+.recv-prod-opt{padding:8px 11px;cursor:pointer;font-size:12px;border-bottom:1px solid var(--gray100);display:flex;justify-content:space-between;align-items:center}
+.recv-prod-opt:hover{background:#e8f0fe}
+.recv-row-del{padding:4px 8px;font-size:12px;color:var(--red);background:#fff;border:1px solid #fca5a5;border-radius:4px;cursor:pointer;white-space:nowrap;transition:all .12s}
+.recv-row-del:hover{background:var(--red-light);border-color:var(--red)}
+/* Notes bar */
+.recv-notes-bar{padding:8px 16px;background:#fff;border-top:1px solid var(--gray200);flex-shrink:0}
+/* Footer */
+.recv-footer{background:#fff;border-top:2px solid #1a3354;padding:8px 16px 10px;display:flex;align-items:center;gap:0;flex-shrink:0;flex-wrap:wrap}
+.recv-sum-item{display:flex;flex-direction:column;align-items:flex-end;padding-right:14px;border-right:1px solid var(--gray200);margin-right:14px;flex-shrink:0}
+.recv-sum-label{font-size:10px;color:var(--gray500);font-weight:600;text-transform:uppercase;white-space:nowrap}
+.recv-sum-val{font-size:14px;font-weight:700;color:var(--gray800);white-space:nowrap}
+.recv-post-btn{margin-left:auto;padding:10px 28px;background:#1a3354;color:#fff;border:none;border-radius:6px;font-size:14px;font-weight:700;cursor:pointer;transition:all .15s;white-space:nowrap;display:flex;align-items:center;gap:6px}
+.recv-post-btn:hover{background:#234778}
+/* History panel */
+.recv-hist-panel{display:flex;flex-direction:column;flex:1;overflow:hidden;min-height:0;padding:16px;gap:12px;background:var(--gray100)}
+.recv-hist-panel .table-wrap{flex:1;overflow:auto;min-height:0;background:#fff;border-radius:var(--radius);box-shadow:var(--shadow)}
+/* Responsive */
+@media(max-width:600px){
+  .recv-topbar{padding:6px 8px;gap:6px}
+  .recv-field-grp{min-width:110px}
+  .recv-action-bar{padding:4px 8px}
+  .recv-table{font-size:12px}
+  .recv-table th,.recv-table td{padding:5px 7px}
+  .recv-footer{padding:6px 8px 8px}
+  .recv-post-btn{width:100%;margin-top:6px;margin-left:0;justify-content:center}
+  .recv-sum-item{padding-right:10px;margin-right:10px}
+}
+
 /* ── RETURNS ── */
 .return-badge{padding:2px 8px;border-radius:9999px;font-size:11px;font-weight:600}
 .return-pending{background:var(--amber-light);color:var(--amber)}
@@ -837,9 +911,9 @@ th.sort-asc .sort-icon,th.sort-desc .sort-icon{opacity:1;color:var(--green)}
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 7H4a2 2 0 00-2 2v6a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></svg>
           Products
         </div>
-        <div class="nav-item" data-page="inv-history" onclick="navigate('inv-history')">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="10"/></svg>
-          Stock History
+        <div class="nav-item" data-page="receipt-history" onclick="navigate('receipt-history')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+          Receipt History
         </div>
         <div class="nav-item" data-page="suppliers" onclick="navigate('suppliers')">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
@@ -1266,93 +1340,113 @@ th.sort-asc .sort-icon,th.sort-desc .sort-icon{opacity:1;color:var(--green)}
       <!-- ══ PAGE: RECEIVING ══ -->
       <div id="page-receiving" class="page">
 
-        <!-- Held receivings section -->
-        <div id="held-recv-section" style="margin-bottom:16px;display:none">
-          <div style="font-size:12px;font-weight:600;color:var(--gray600);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">⏸ On Hold</div>
-          <div id="held-recv-list"></div>
+        <!-- Tab bar -->
+        <div class="recv-tabs">
+          <div class="recv-tab active" id="recv-tab-new" onclick="switchRecvTab('new')">📦 New Receipt</div>
+          <div class="recv-tab" id="recv-tab-hist" onclick="switchRecvTab('hist')">📋 History</div>
         </div>
 
-        <!-- Header toolbar -->
-        <div class="inv-toolbar" style="margin-bottom:16px;flex-wrap:wrap;gap:10px">
-          <div style="display:flex;gap:10px;flex:1;flex-wrap:wrap">
-            <input class="form-control" id="recv-invoice-no" placeholder="Invoice / GRN No." style="max-width:200px">
-            <select class="form-control" id="recv-supplier" style="max-width:220px">
-              <option value="">— Select Supplier —</option>
-            </select>
-            <input class="form-control" type="date" id="recv-date" style="max-width:160px">
+        <!-- ── TAB: NEW RECEIPT ── -->
+        <div class="recv-tab-panel active" id="recv-panel-new">
+
+          <!-- Held receivings strip (hidden when empty) -->
+          <div class="recv-held-strip" id="held-recv-section" style="display:none">
+            <div style="font-size:10px;font-weight:700;color:var(--gray500);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">⏸ On Hold</div>
+            <div id="held-recv-list"></div>
           </div>
-          <div style="display:flex;gap:8px;margin-left:auto">
-            <button class="btn btn-secondary" onclick="holdReceiving()" title="Save this receiving session and start a new one">⏸ Hold</button>
-            <button class="btn btn-primary" onclick="postReceipt()">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><polyline points="20 6 9 17 4 12"/></svg>
+
+          <!-- Topbar: document header fields -->
+          <div class="recv-topbar">
+            <div class="recv-field-grp">
+              <span class="recv-field-label">Invoice / GRN No. *</span>
+              <input class="form-control" id="recv-invoice-no" placeholder="e.g. INV-001" style="font-size:13px">
+            </div>
+            <div class="recv-field-grp">
+              <span class="recv-field-label">Supplier *</span>
+              <select class="form-control" id="recv-supplier" style="font-size:13px">
+                <option value="">— Select Supplier —</option>
+              </select>
+            </div>
+            <div class="recv-field-grp" style="max-width:180px;flex:0 0 160px">
+              <span class="recv-field-label">Date *</span>
+              <input class="form-control" type="date" id="recv-date" style="font-size:13px">
+            </div>
+          </div>
+
+          <!-- Action bar: product search + quick actions -->
+          <div class="recv-action-bar">
+            <div class="recv-search-wrap">
+              <div class="input-group">
+                <span class="input-icon">🔍</span>
+                <input class="form-control" id="recv-quick-search" placeholder="Search product name or SKU to add to receipt…" oninput="_recvSearchInput(this.value)" onkeydown="_recvSearchKey(event)" autocomplete="off" style="font-size:13px">
+              </div>
+              <div class="recv-search-dropdown" id="recv-quick-results"></div>
+            </div>
+            <button class="qb-action-btn" onclick="addReceivingLine()">+ Blank Line</button>
+            <button class="qb-action-btn" onclick="holdReceiving()" title="Save this session and start a new one">⏸ Hold</button>
+          </div>
+
+          <!-- Line items table -->
+          <div class="recv-table-wrap">
+            <table class="recv-table">
+              <thead>
+                <tr>
+                  <th style="width:30%">Product</th>
+                  <th style="width:70px;text-align:center">Qty</th>
+                  <th style="width:120px;text-align:right">Unit Cost (KES)</th>
+                  <th style="width:110px">Batch No.</th>
+                  <th style="width:120px">Expiry Date</th>
+                  <th style="width:110px;text-align:right">Line Total</th>
+                  <th style="width:38px"></th>
+                </tr>
+              </thead>
+              <tbody id="recv-lines-body"></tbody>
+            </table>
+          </div>
+
+          <!-- Notes -->
+          <div class="recv-notes-bar">
+            <textarea class="form-control" id="recv-notes" rows="2" placeholder="Notes / remarks about this delivery…" style="resize:none;font-size:13px;width:100%"></textarea>
+          </div>
+
+          <!-- Footer: summary + post -->
+          <div class="recv-footer">
+            <div class="recv-sum-item">
+              <span class="recv-sum-label">Lines</span>
+              <span class="recv-sum-val" id="recv-total-lines">0</span>
+            </div>
+            <div class="recv-sum-item" style="border-right:none;margin-right:0">
+              <span class="recv-sum-label">Invoice Total</span>
+              <span class="recv-sum-val" id="recv-grand-total">KES 0.00</span>
+            </div>
+            <button class="recv-post-btn" onclick="postReceipt()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="15" height="15"><polyline points="20 6 9 17 4 12"/></svg>
               Post Receipt
             </button>
           </div>
         </div>
 
-        <!-- Line items card -->
-        <div class="card" style="margin-bottom:16px">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-            <h3 style="margin:0;font-size:14px;font-weight:600">Items Received</h3>
-          </div>
-          <!-- Quick-add search bar -->
-          <div class="recv-quick-bar" style="margin-bottom:10px">
-            <div style="position:relative;flex:1;max-width:380px">
-              <input class="form-control" id="recv-quick-search" placeholder="🔍 Type product name to add…" oninput="filterRecvQuick()" onkeydown="recvQuickKeydown(event)" autocomplete="off" style="font-size:13px">
-              <div id="recv-quick-results" style="display:none;position:absolute;z-index:400;left:0;right:0;top:100%;background:#fff;border:1px solid var(--gray200);border-radius:var(--radius);box-shadow:0 4px 16px rgba(0,0,0,.12);max-height:220px;overflow-y:auto;margin-top:2px"></div>
+        <!-- ── TAB: HISTORY ── -->
+        <div class="recv-tab-panel" id="recv-panel-hist">
+          <div class="recv-hist-panel">
+            <div style="display:flex;align-items:center;gap:12px;flex-shrink:0">
+              <h3 style="margin:0;font-size:14px;font-weight:600">Receipt History</h3>
+              <input class="form-control" id="recv-hist-search" placeholder="Search receipts…" oninput="renderReceiptHistory()" style="max-width:260px;font-size:13px;margin-left:auto">
             </div>
-            <span style="font-size:12px;color:var(--gray400)">↵ Enter to add • Edit details in table</span>
-          </div>
-          <div style="overflow-x:auto">
-            <table class="recv-lines-table">
-              <thead>
-                <tr>
-                  <th style="width:30%">Product</th>
-                  <th style="width:12%">Qty</th>
-                  <th style="width:14%">Unit Cost (KES)</th>
-                  <th style="width:14%">Batch No.</th>
-                  <th style="width:14%">Expiry Date</th>
-                  <th style="width:12%">Line Total</th>
-                  <th style="width:4%"></th>
-                </tr>
-              </thead>
-              <tbody id="recv-lines-body">
-              </tbody>
-            </table>
-          </div>
-          <div class="recv-summary-bar">
-            <span>Total Lines: <strong id="recv-total-lines">0</strong></span>
-            <span style="margin-left:auto">Invoice Total: <strong id="recv-grand-total">KES 0.00</strong></span>
-          </div>
-          <div>
-            <label style="font-size:12px;font-weight:600;color:var(--gray600);display:block;margin-bottom:4px">Notes / Remarks</label>
-            <textarea class="form-control" id="recv-notes" rows="2" placeholder="Optional notes about this delivery…" style="resize:vertical;font-size:13px"></textarea>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Date</th><th>Invoice No.</th><th>Supplier</th>
+                    <th>Items</th><th>Total</th><th>Posted By</th><th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="recv-hist-tbody"></tbody>
+              </table>
+            </div>
           </div>
         </div>
 
-        <!-- Receipt history -->
-        <div class="card">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-            <h3 style="margin:0;font-size:14px;font-weight:600">Receipt History</h3>
-            <input class="form-control" id="recv-hist-search" placeholder="Search receipts…" oninput="renderReceiptHistory()" style="max-width:240px;font-size:13px">
-          </div>
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Date</th>
-                  <th>Invoice No.</th>
-                  <th>Supplier</th>
-                  <th>Items</th>
-                  <th>Total</th>
-                  <th>Posted By</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody id="recv-hist-tbody"></tbody>
-            </table>
-          </div>
-        </div>
       </div>
 
       <!-- ══ PAGE: QUOTES ══ -->
@@ -2940,10 +3034,10 @@ function _resetInactivity(){
 }
 
 const ROLE_ACCESS={
-  admin:['pos','sales-history','returns','quotes','customers','inventory','inv-history','suppliers','receiving','reports','users','settings','marketing','leaderboard'],
-  manager:['pos','sales-history','returns','quotes','customers','inventory','inv-history','suppliers','receiving','reports','marketing','leaderboard'],
+  admin:['pos','sales-history','returns','quotes','customers','inventory','inv-history','suppliers','receiving','receipt-history','reports','users','settings','marketing','leaderboard'],
+  manager:['pos','sales-history','returns','quotes','customers','inventory','inv-history','suppliers','receiving','receipt-history','reports','marketing','leaderboard'],
   cashier:['pos','sales-history','returns','quotes','customers','marketing','leaderboard'],
-  stock:['inventory','inv-history','suppliers','receiving','marketing','leaderboard']
+  stock:['inventory','inv-history','suppliers','receiving','receipt-history','marketing','leaderboard']
 };
 
 document.getElementById('login-form').addEventListener('submit',async e=>{
@@ -3293,11 +3387,13 @@ function navigate(page){
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   const contentEl=document.querySelector('.content');
   if(contentEl) contentEl.classList.toggle('pos-active', page==='pos');
-  const el=document.getElementById('page-'+page);
+  if(contentEl) contentEl.classList.toggle('recv-active', page==='receiving'||page==='receipt-history');
+  const pageId=page==='receipt-history'?'receiving':page;
+  const el=document.getElementById('page-'+pageId);
   if(el) el.classList.add('active');
   const navEl=document.querySelector(`.nav-item[data-page="${page}"]`);
   if(navEl) navEl.classList.add('active');
-  const titles={pos:'Point of Sale',['sales-history']:'Sales History',returns:'Returns & Refunds',quotes:'Quotations',customers:'Customer Accounts',inventory:'Product Inventory',['inv-history']:'Stock History',suppliers:'Supplier Management',receiving:'Invoice Receiving',reports:'Reports',users:'User Management',settings:'Settings',marketing:'Marketing Hub',leaderboard:'🏆 Sales Leaderboard'};
+  const titles={pos:'Point of Sale',['sales-history']:'Sales History',returns:'Returns & Refunds',quotes:'Quotations',customers:'Customer Accounts',inventory:'Product Inventory',['inv-history']:'Stock History',suppliers:'Supplier Management',receiving:'Invoice Receiving',['receipt-history']:'Receipt History',reports:'Reports',users:'User Management',settings:'Settings',marketing:'Marketing Hub',leaderboard:'🏆 Sales Leaderboard'};
   if(page==='marketing') renderMarketingTab();
   if(page==='leaderboard') renderLeaderboardPage();
   document.getElementById('topbar-title').textContent=titles[page]||page;
@@ -3313,6 +3409,7 @@ function navigate(page){
   if(page==='inv-history') renderHistoryTable();
   if(page==='suppliers') renderSuppliers();
   if(page==='receiving') renderReceiving();
+  if(page==='receipt-history'){renderReceiving();switchRecvTab('hist');}
   if(page==='reports') renderReports();
   if(page==='users') renderUsers();
   if(page==='settings'){loadSettingsForm();renderBackupList();}
@@ -4626,38 +4723,83 @@ function renderHeldReceivings(){
   }).join('');
 }
 
-/* ── Quick-add search bar ── */
-function filterRecvQuick(){
-  const inp=document.getElementById('recv-quick-search');
-  const res=document.getElementById('recv-quick-results');
-  if(!inp||!res) return;
-  const val=inp.value.toLowerCase().trim();
-  if(!val){res.style.display='none';return;}
-  const matches=DB.all('products').filter(p=>
-    p.name.toLowerCase().includes(val)||((p.sku||'').toLowerCase().includes(val))
-  ).sort((a,b)=>a.name.localeCompare(b.name)).slice(0,12);
-  if(!matches.length){res.style.display='none';return;}
-  res.innerHTML=matches.map((p,i)=>`
-    <div id="recv-quick-opt-${i}" onmousedown="recvQuickSelect('${p.id}')"
-      style="padding:9px 12px;cursor:pointer;font-size:13px;border-bottom:1px solid var(--gray100)"
-      onmouseover="this.style.background='var(--gray50)'" onmouseout="this.style.background=''">
-      ${p.name}${p.sku?`<span style="color:var(--gray400);font-size:11px;margin-left:6px">${p.sku}</span>`:''}
-      <span style="float:right;color:var(--gray400);font-size:11px">Stock: ${p.stock}</span>
-    </div>`).join('');
-  res.style.display='block';
+/* ── Receiving tab switcher ── */
+function switchRecvTab(tab){
+  ['new','hist'].forEach(t=>{
+    document.getElementById('recv-tab-'+t)?.classList.toggle('active',t===tab);
+    document.getElementById('recv-panel-'+t)?.classList.toggle('active',t===tab);
+  });
+  if(tab==='hist') renderReceiptHistory();
 }
 
-function recvQuickKeydown(e){
-  if(e.key==='Enter'){
-    const res=document.getElementById('recv-quick-results');
-    const first=res?.querySelector('[id^="recv-quick-opt-"]');
-    if(first) first.dispatchEvent(new MouseEvent('mousedown'));
+/* ── Receiving QB-style product search ── */
+let _recvSdFocusIdx=-1;
+
+function _recvSearchInput(val){
+  const dd=document.getElementById('recv-quick-results');
+  if(!dd) return;
+  const q=(val||'').trim().toLowerCase();
+  if(!q){dd.classList.remove('open');dd.innerHTML='';_recvSdFocusIdx=-1;return;}
+  const products=DB.all('products').filter(p=>
+    p.name.toLowerCase().includes(q)||((p.sku||'').toLowerCase().includes(q))
+  ).slice(0,10);
+  if(!products.length){
+    dd.innerHTML=`<div style="padding:12px 14px;color:var(--gray400);font-size:13px">No products match "<strong>${val}</strong>"</div>`;
+    dd.classList.add('open');_recvSdFocusIdx=-1;return;
   }
-  if(e.key==='Escape'){
-    const res=document.getElementById('recv-quick-results');
-    if(res) res.style.display='none';
+  _recvSdFocusIdx=-1;
+  dd.innerHTML=products.map(p=>`
+    <div class="recv-sd-item" data-pid="${p.id}" onmousedown="event.preventDefault();recvQuickSelect('${p.id}')">
+      <div class="recv-sd-left">
+        <div class="recv-sd-name">${p.name}</div>
+        <div class="recv-sd-meta">SKU: ${p.sku||'—'} · Stock: ${p.stock<=0?'<span style="color:var(--red)">Out of stock</span>':p.stock}</div>
+      </div>
+      <div class="recv-sd-right">
+        ${p.buyPrice?`<div class="recv-sd-cost">${kes(p.buyPrice)}</div><div style="font-size:10px;color:var(--gray400)">Last cost</div>`:'<div style="font-size:11px;color:var(--gray400)">No cost on file</div>'}
+      </div>
+    </div>`).join('');
+  dd.classList.add('open');
+}
+
+function _recvSearchKey(e){
+  const dd=document.getElementById('recv-quick-results');
+  if(!dd||!dd.classList.contains('open')) return;
+  const items=dd.querySelectorAll('.recv-sd-item');
+  if(!items.length) return;
+  if(e.key==='ArrowDown'){
+    e.preventDefault();
+    _recvSdFocusIdx=Math.min(_recvSdFocusIdx+1,items.length-1);
+    items.forEach((el,i)=>el.classList.toggle('focused',i===_recvSdFocusIdx));
+    items[_recvSdFocusIdx]?.scrollIntoView({block:'nearest'});
+  } else if(e.key==='ArrowUp'){
+    e.preventDefault();
+    _recvSdFocusIdx=Math.max(_recvSdFocusIdx-1,0);
+    items.forEach((el,i)=>el.classList.toggle('focused',i===_recvSdFocusIdx));
+    items[_recvSdFocusIdx]?.scrollIntoView({block:'nearest'});
+  } else if(e.key==='Enter'){
+    e.preventDefault();
+    const focused=_recvSdFocusIdx>=0?items[_recvSdFocusIdx]:items[0];
+    if(focused&&focused.dataset.pid) recvQuickSelect(focused.dataset.pid);
+  } else if(e.key==='Escape'){
+    dd.classList.remove('open');dd.innerHTML='';_recvSdFocusIdx=-1;
   }
 }
+
+document.addEventListener('click',e=>{
+  if(!e.target.closest('.recv-search-wrap')){
+    const dd=document.getElementById('recv-quick-results');
+    if(dd){dd.classList.remove('open');dd.innerHTML='';}
+  }
+},{passive:true});
+
+/* ── Quick-add search bar (legacy name kept for recvQuickSelect compat) ── */
+function filterRecvQuick(){
+  // Replaced by _recvSearchInput — this stub kept for any legacy callers
+  const inp=document.getElementById('recv-quick-search');
+  if(inp) _recvSearchInput(inp.value);
+}
+function recvQuickKeydown(e){ _recvSearchKey(e); }
+
 
 function recvQuickSelect(productId){
   const p=DB.all('products').find(x=>x.id===productId);
@@ -4673,7 +4815,10 @@ function recvQuickSelect(productId){
   const inp=document.getElementById('recv-quick-search');
   const res=document.getElementById('recv-quick-results');
   if(inp){inp.value='';inp.focus();}
-  if(res) res.style.display='none';
+  if(res){res.classList.remove('open');res.innerHTML='';}
+  // Scroll table to the newly added/updated row
+  const tbody=document.getElementById('recv-lines-body');
+  if(tbody){const lastRow=tbody.lastElementChild;if(lastRow) lastRow.scrollIntoView({block:'nearest'});}
   toast(`Added: ${p.name}`,'success');
 }
 
@@ -4691,17 +4836,17 @@ function renderRecvLines(){
     const prodName=ln.productId?(prods.find(p=>p.id===ln.productId)||{name:''}).name:'';
     return `<tr>
       <td data-label="Product">
-        <div style="position:relative;min-width:150px">
-          <input id="recv-prod-search-${i}" value="${prodName.replace(/"/g,'&quot;')}" placeholder="🔍 Search product…" oninput="filterRecvProducts(${i})" autocomplete="off" style="width:100%;padding:4px 7px;border:1px solid var(--gray200);border-radius:6px;font-size:12px;background:var(--white);box-sizing:border-box" onfocus="filterRecvProducts(${i})">
-          <div id="recv-prod-results-${i}" style="display:none;position:absolute;z-index:300;left:0;right:0;top:100%;background:#fff;border:1px solid var(--gray200);border-radius:var(--radius);box-shadow:0 4px 16px rgba(0,0,0,.12);max-height:200px;overflow-y:auto;margin-top:2px"></div>
+        <div class="recv-prod-wrap">
+          <input id="recv-prod-search-${i}" value="${prodName.replace(/"/g,'&quot;')}" placeholder="🔍 Search product…" oninput="filterRecvProducts(${i})" autocomplete="off" onfocus="filterRecvProducts(${i})">
+          <div class="recv-prod-drop" id="recv-prod-results-${i}"></div>
         </div>
       </td>
-      <td data-label="Qty"><input type="number" min="1" value="${ln.qty}" onchange="recvLineChange(${i},'qty',this.value)" style="width:70px"></td>
-      <td data-label="Unit Cost (KES)"><input type="number" min="0" step="0.01" value="${ln.unitCost}" placeholder="0.00" onchange="recvLineChange(${i},'unitCost',this.value)" style="width:100px"></td>
-      <td data-label="Batch No."><input type="text" value="${ln.batchNo}" placeholder="Optional" oninput="recvLineChange(${i},'batchNo',this.value)" style="width:100px"></td>
-      <td data-label="Expiry Date"><input type="date" value="${ln.expiry}" onchange="recvLineChange(${i},'expiry',this.value)" style="width:130px"></td>
-      <td data-label="Line Total" style="font-weight:600;color:var(--green-dark)" id="recv-line-total-${i}">KES ${lineTotal.toLocaleString('en-KE',{minimumFractionDigits:2})}</td>
-      <td><button class="btn btn-secondary recv-remove-btn" onclick="removeReceivingLine(${i})" style="padding:3px 8px;font-size:12px;color:var(--red)">✕</button></td>
+      <td data-label="Qty" style="text-align:center"><input type="number" min="1" value="${ln.qty}" onchange="recvLineChange(${i},'qty',this.value)" style="width:65px;text-align:center"></td>
+      <td data-label="Unit Cost (KES)" style="text-align:right"><input type="number" min="0" step="0.01" value="${ln.unitCost}" placeholder="0.00" onchange="recvLineChange(${i},'unitCost',this.value)" style="width:105px;text-align:right"></td>
+      <td data-label="Batch No."><input type="text" value="${ln.batchNo}" placeholder="Optional" oninput="recvLineChange(${i},'batchNo',this.value)"></td>
+      <td data-label="Expiry Date"><input type="date" value="${ln.expiry}" onchange="recvLineChange(${i},'expiry',this.value)"></td>
+      <td data-label="Line Total" style="text-align:right;font-weight:700;color:var(--green-dark);font-size:13px" id="recv-line-total-${i}">KES ${lineTotal.toLocaleString('en-KE',{minimumFractionDigits:2})}</td>
+      <td><button class="recv-row-del" onclick="removeReceivingLine(${i})">✕</button></td>
     </tr>`;
   }).join('');
   updateRecvSummary();
@@ -4712,13 +4857,16 @@ function filterRecvProducts(idx){
   const res=document.getElementById('recv-prod-results-'+idx);
   if(!inp||!res) return;
   const val=inp.value.toLowerCase().trim();
-  if(!val){res.style.display='none';return;}
+  if(!val){res.classList.remove('open');res.innerHTML='';return;}
   const matches=DB.all('products').filter(p=>
     p.name.toLowerCase().includes(val)||((p.sku||'').toLowerCase().includes(val))
-  ).sort((a,b)=>a.name.localeCompare(b.name)).slice(0,14);
-  if(!matches.length){res.style.display='none';return;}
-  res.innerHTML=matches.map(p=>`<div onmousedown="selectRecvProduct(${idx},'${p.id}')" style="padding:9px 12px;cursor:pointer;font-size:13px;border-bottom:1px solid var(--gray100)" onmouseover="this.style.background='var(--gray50)'" onmouseout="this.style.background=''">${p.name}${p.sku?`<span style="color:var(--gray400);font-size:11px;margin-left:6px">${p.sku}</span>`:''}<span style="float:right;color:var(--gray400);font-size:11px">Stock: ${p.stock}</span></div>`).join('');
-  res.style.display='block';
+  ).sort((a,b)=>a.name.localeCompare(b.name)).slice(0,12);
+  if(!matches.length){res.classList.remove('open');res.innerHTML='';return;}
+  res.innerHTML=matches.map(p=>`<div class="recv-prod-opt" onmousedown="event.preventDefault();selectRecvProduct(${idx},'${p.id}')">
+    <span>${p.name}${p.sku?`<span style="color:var(--gray400);font-size:11px;margin-left:6px">${p.sku}</span>`:''}</span>
+    <span style="color:var(--gray400);font-size:11px">Stock: ${p.stock}${p.buyPrice?` · ${kes(p.buyPrice)}`:''}</span>
+  </div>`).join('');
+  res.classList.add('open');
 }
 
 function selectRecvProduct(idx,productId){
@@ -4727,7 +4875,7 @@ function selectRecvProduct(idx,productId){
   const inp=document.getElementById('recv-prod-search-'+idx);
   if(inp) inp.value=p?p.name:'';
   const res=document.getElementById('recv-prod-results-'+idx);
-  if(res) res.style.display='none';
+  if(res){res.classList.remove('open');res.innerHTML='';}
   // Pre-fill buy price if cost field is empty
   if(p&&p.buyPrice&&!recvLines[idx].unitCost){
     recvLines[idx].unitCost=p.buyPrice;
