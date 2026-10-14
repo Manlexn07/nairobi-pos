@@ -5010,48 +5010,7 @@ function renderReceiptHistory(){
 function viewReceipt(id){
   const r=DB.all('receipts').find(x=>x.id===id);
   if(!r) return;
-  const settings=DB.get('settings')||{};
-  const itemsHtml=r.items.map(it=>`
-    <tr>
-      <td>${it.productName}</td>
-      <td style="text-align:center">${it.qty}</td>
-      <td style="text-align:right">KES ${it.unitCost.toLocaleString('en-KE',{minimumFractionDigits:2})}</td>
-      <td style="text-align:right">KES ${it.lineTotal.toLocaleString('en-KE',{minimumFractionDigits:2})}</td>
-      <td>${it.batchNo||'—'}</td>
-      <td>${it.expiry||'—'}</td>
-    </tr>
-  `).join('');
-  const html=`
-    <div style="font-family:Arial,sans-serif;max-width:720px;margin:0 auto;padding:24px">
-      <div style="text-align:center;margin-bottom:20px">
-        <h2 style="margin:0;font-size:20px">${settings.bizName||'NairobiPOS'}</h2>
-        <p style="margin:4px 0;color:#555;font-size:13px">${settings.location||''} | ${settings.phone||''}</p>
-        <h3 style="margin:12px 0 4px;font-size:15px;border-top:2px solid #333;padding-top:10px">GOODS RECEIVED NOTE</h3>
-      </div>
-      <table style="width:100%;font-size:13px;margin-bottom:16px">
-        <tr><td><strong>Invoice No:</strong> ${r.invoiceNo}</td><td><strong>Date:</strong> ${fmtDate(r.date||r.postedAt)}</td></tr>
-        <tr><td><strong>Supplier:</strong> ${r.supplierName}</td><td><strong>Posted By:</strong> ${r.postedBy}</td></tr>
-        ${r.notes?`<tr><td colspan="2"><strong>Notes:</strong> ${r.notes}</td></tr>`:''}
-      </table>
-      <table style="width:100%;border-collapse:collapse;font-size:13px">
-        <thead><tr style="background:#f0f0f0">
-          <th style="padding:8px;text-align:left;border:1px solid #ddd">Product</th>
-          <th style="padding:8px;text-align:center;border:1px solid #ddd">Qty</th>
-          <th style="padding:8px;text-align:right;border:1px solid #ddd">Unit Cost</th>
-          <th style="padding:8px;text-align:right;border:1px solid #ddd">Total</th>
-          <th style="padding:8px;border:1px solid #ddd">Batch</th>
-          <th style="padding:8px;border:1px solid #ddd">Expiry</th>
-        </tr></thead>
-        <tbody>${itemsHtml}</tbody>
-        <tfoot><tr style="font-weight:bold;background:#f9f9f9">
-          <td colspan="3" style="padding:8px;border:1px solid #ddd;text-align:right">TOTAL</td>
-          <td style="padding:8px;border:1px solid #ddd;text-align:right">KES ${(r.total||0).toLocaleString('en-KE',{minimumFractionDigits:2})}</td>
-          <td colspan="2" style="border:1px solid #ddd"></td>
-        </tr></tfoot>
-      </table>
-    </div>
-  `;
-  openPrintWindow(html,'');
+  _viewGRN(r);
 }
 
 /* ════════════════════════════════════════════════
