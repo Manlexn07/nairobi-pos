@@ -442,22 +442,34 @@ th.sort-asc .sort-icon,th.sort-desc .sort-icon{opacity:1;color:var(--green)}
 .tier-btn.active{border-color:var(--green);background:var(--green-light);color:var(--green-dark)}
 
 /* ── QB-STYLE POS LAYOUT ── */
-#page-pos.active{display:flex;flex-direction:row;height:100%}
-/* Left action sidebar */
-.qb-sidebar{width:158px;background:#1a3354;display:flex;flex-direction:column;gap:3px;padding:8px 6px;flex-shrink:0;overflow-y:auto}
-.qb-sb-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px 6px 8px;background:#234778;border:1px solid rgba(255,255,255,.08);border-radius:6px;color:#d0e4f7;font-size:11px;font-weight:600;cursor:pointer;text-align:center;line-height:1.3;transition:all .15s;gap:3px}
-.qb-sb-btn:hover{background:#2d5a96;color:#fff;border-color:rgba(255,255,255,.2)}
-.qb-sb-btn.active{background:#2563eb;color:#fff;border-color:#60a5fa}
-.qb-sb-icon{font-size:18px;line-height:1}
-.qb-sb-sep{height:1px;background:rgba(255,255,255,.12);margin:3px 0;flex-shrink:0}
-.qb-sb-count{font-size:10px;background:rgba(255,255,255,.15);border-radius:10px;padding:1px 6px;margin-top:1px}
-/* Main area */
+#page-pos.active{display:flex;flex-direction:column;height:100%}
+/* Main area (full width, no sidebar) */
 .qb-main{flex:1;display:flex;flex-direction:column;overflow:hidden;background:var(--gray100)}
 /* Top bar */
-.qb-topbar{display:flex;gap:8px;padding:8px 12px;background:#fff;border-bottom:2px solid #1a3354;align-items:center;flex-shrink:0}
+.qb-topbar{display:flex;gap:8px;padding:8px 12px;background:#fff;border-bottom:2px solid #1a3354;align-items:center;flex-shrink:0;flex-wrap:wrap}
+.qb-topbar-search{display:flex;gap:8px;flex:2;min-width:220px;align-items:center}
+.qb-topbar-customer{flex:1;min-width:160px}
+/* Search autocomplete */
+.pos-search-wrap{position:relative;flex:1}
+.pos-search-dropdown{position:absolute;top:100%;left:0;right:0;z-index:300;background:#fff;border:1.5px solid #1a3354;border-top:none;border-radius:0 0 8px 8px;box-shadow:0 8px 24px rgba(0,0,0,.18);max-height:320px;overflow-y:auto;display:none}
+.pos-search-dropdown.open{display:block}
+.pos-sd-item{display:flex;align-items:center;gap:10px;padding:9px 14px;cursor:pointer;border-bottom:1px solid var(--gray100);transition:background .1s}
+.pos-sd-item:last-child{border-bottom:none}
+.pos-sd-item:hover,.pos-sd-item.focused{background:#e8f0fe}
+.pos-sd-left{flex:1;min-width:0}
+.pos-sd-name{font-weight:600;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pos-sd-meta{font-size:11px;color:var(--gray500);margin-top:1px}
+.pos-sd-right{text-align:right;flex-shrink:0}
+.pos-sd-price{font-weight:700;color:#1a3354;font-size:13px}
+.pos-sd-oos{font-size:10px;font-weight:700;color:var(--red);background:var(--red-light);border-radius:3px;padding:1px 5px;margin-top:2px;display:inline-block}
+.pos-sd-empty{padding:14px;text-align:center;color:var(--gray400);font-size:13px}
 /* Tier + held bar row */
-.qb-tier-bar{display:flex;gap:6px;padding:5px 12px;background:var(--gray50);border-bottom:1px solid var(--gray200);align-items:center;flex-shrink:0}
+.qb-tier-bar{display:flex;gap:6px;padding:5px 12px;background:var(--gray50);border-bottom:1px solid var(--gray200);align-items:center;flex-shrink:0;flex-wrap:wrap}
 .qb-tier-label{font-size:10px;font-weight:700;color:var(--gray400);text-transform:uppercase;white-space:nowrap;margin-right:2px}
+/* Quick action buttons in tier bar */
+.qb-action-btn{padding:4px 10px;border-radius:5px;font-size:11px;font-weight:600;border:1.5px solid #1a3354;background:#fff;color:#1a3354;cursor:pointer;white-space:nowrap;transition:all .12s}
+.qb-action-btn:hover{background:#1a3354;color:#fff}
+.qb-action-btn.active{background:#1a3354;color:#fff}
 /* Quick Pick panel */
 .qb-picks-panel{background:#fff;border-bottom:2px solid var(--gray200);overflow:hidden;transition:max-height .2s;flex-shrink:0}
 .qb-picks-panel.open{max-height:280px;display:flex;flex-direction:column}
@@ -466,11 +478,11 @@ th.sort-asc .sort-icon,th.sort-desc .sort-icon{opacity:1;color:var(--green)}
 .qb-picks-inner .pos-category-bar{flex-shrink:0}
 .qb-picks-inner .product-grid{flex:1;overflow-y:auto;min-height:0;max-height:180px}
 /* Cart table area */
-.qb-cart-wrap{flex:1;overflow-y:auto;min-height:0;background:#fff}
-.qb-cart-table{width:100%;border-collapse:collapse;font-size:13px}
+.qb-cart-wrap{flex:1;overflow:auto;min-height:0;background:#fff}
+.qb-cart-table{width:100%;border-collapse:collapse;font-size:13px;min-width:560px}
 .qb-cart-table thead tr{background:#1a3354}
-.qb-cart-table th{padding:8px 12px;text-align:left;font-size:11px;font-weight:600;color:#c8daf0;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap;position:sticky;top:0;z-index:1}
-.qb-cart-table td{padding:10px 12px;border-bottom:1px solid var(--gray100);vertical-align:middle}
+.qb-cart-table th{padding:8px 10px;text-align:left;font-size:11px;font-weight:600;color:#c8daf0;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap;position:sticky;top:0;z-index:1}
+.qb-cart-table td{padding:9px 10px;border-bottom:1px solid var(--gray100);vertical-align:middle}
 .qb-cart-table tbody tr:last-child td{border-bottom:none}
 .qb-cart-table tbody tr:hover td{background:var(--gray50)}
 .qb-cart-table tbody tr.row-selected td{background:#e8f5e9}
@@ -480,13 +492,13 @@ th.sort-asc .sort-icon,th.sort-desc .sort-icon{opacity:1;color:var(--green)}
 .qb-row-btn.danger{color:var(--red);border-color:#fca5a5}.qb-row-btn.danger:hover{background:var(--red-light)}
 /* QB Footer */
 .qb-footer{background:#fff;border-top:2px solid #1a3354;flex-shrink:0;padding:8px 14px 10px}
-.qb-summary-bar{display:flex;align-items:flex-end;gap:0;padding-bottom:8px;border-bottom:1px solid var(--gray200);margin-bottom:8px}
-.qb-summary-item{display:flex;flex-direction:column;align-items:flex-end;padding:0 14px 0 0;border-right:1px solid var(--gray200);margin-right:14px}
+.qb-summary-bar{display:flex;align-items:flex-end;gap:0;padding-bottom:8px;border-bottom:1px solid var(--gray200);margin-bottom:8px;overflow-x:auto}
+.qb-summary-item{display:flex;flex-direction:column;align-items:flex-end;padding:0 12px 0 0;border-right:1px solid var(--gray200);margin-right:12px;flex-shrink:0}
 .qb-summary-item:first-child{padding-left:0}
 .qb-summary-item.total-item{border-right:none;margin-right:0;padding-right:0;margin-left:auto}
 .qb-summary-label{font-size:10px;color:var(--gray500);font-weight:600;text-transform:uppercase;white-space:nowrap}
 .qb-summary-val{font-size:14px;font-weight:700;color:var(--gray800);white-space:nowrap}
-.qb-payment-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.qb-payment-row{display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap}
 .qb-pay-btn{padding:9px 14px;border-radius:6px;font-weight:700;font-size:13px;border:1.5px solid var(--gray300);background:#fff;cursor:pointer;transition:all .15s;white-space:nowrap}
 .qb-pay-btn.active{background:#1a3354;color:#fff;border-color:#1a3354}
 .qb-pay-btn:hover:not(.active){background:var(--gray100);border-color:var(--gray400)}
@@ -499,6 +511,26 @@ th.sort-asc .sort-icon,th.sort-desc .sort-icon{opacity:1;color:var(--green)}
 .qb-hold-only-btn{padding:11px 14px;background:#fff;color:var(--gray700);border:1.5px solid var(--gray300);border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;white-space:nowrap}
 .qb-hold-only-btn:hover:not(:disabled){background:var(--gray100)}
 .qb-hold-only-btn:disabled{opacity:.4;cursor:not-allowed}
+/* ── RESPONSIVE: phone (≤600px) ── */
+@media(max-width:600px){
+  .qb-topbar{padding:6px 8px;gap:6px}
+  .qb-topbar-search{flex:1 1 100%;order:1}
+  .qb-topbar-customer{flex:1 1 100%;order:2}
+  .qb-tier-bar{padding:4px 8px;gap:4px}
+  .qb-footer{padding:6px 8px 8px}
+  .qb-summary-bar{gap:0;padding-bottom:6px;margin-bottom:6px}
+  .qb-summary-item{padding-right:8px;margin-right:8px}
+  .qb-summary-label{font-size:9px}
+  .qb-summary-val{font-size:12px}
+  .qb-amount-val{font-size:18px}
+  .qb-charge-btn{font-size:13px;padding:9px 10px}
+  .qb-payment-row{gap:5px}
+  .qb-pay-btn{padding:7px 10px;font-size:12px}
+  .qb-cart-table{font-size:12px}
+  .qb-cart-table th,.qb-cart-table td{padding:6px 7px}
+  .qb-picks-panel.open{max-height:220px}
+  .qb-picks-inner .product-grid{max-height:140px}
+}
 
 /* ── RETURNS ── */
 .return-badge{padding:2px 8px;border-radius:9999px;font-size:11px;font-weight:600}
@@ -913,46 +945,25 @@ th.sort-asc .sort-icon,th.sort-desc .sort-icon{opacity:1;color:var(--green)}
           <button class="pos-mob-tab" data-tab="cart" onclick="switchPosTab('cart')">🛒 Cart <span class="mob-cart-badge" id="mob-cart-badge">0</span></button>
         </div>
 
-        <!-- ── QB-style sidebar ── -->
-        <div class="qb-sidebar" id="qb-sidebar">
-          <button class="qb-sb-btn" id="qb-quickpick-btn" onclick="toggleQuickPick()">
-            <span class="qb-sb-icon">🛍</span>Quick Pick Items
-          </button>
-          <button class="qb-sb-btn" onclick="qbGiveDiscount()">
-            <span class="qb-sb-icon">🏷</span>Give Discount
-          </button>
-          <div class="qb-sb-sep"></div>
-          <button class="qb-sb-btn" id="qb-hold-sb-btn" onclick="holdSale()">
-            <span class="qb-sb-icon">⏸</span>Hold Sale
-            <span class="qb-sb-count hidden" id="held-bar-count-sb">0</span>
-          </button>
-          <button class="qb-sb-btn" onclick="navigate('returns')">
-            <span class="qb-sb-icon">↩</span>Accept Return
-          </button>
-          <div class="qb-sb-sep"></div>
-          <button class="qb-sb-btn" onclick="logout()">
-            <span class="qb-sb-icon">👤</span>Switch Cashier
-          </button>
-          <button class="qb-sb-btn" onclick="navigate('inventory')">
-            <span class="qb-sb-icon">📦</span>View Inventory
-          </button>
-          <!-- hidden cart-count for JS compat -->
-          <span id="cart-count" style="display:none">0 items</span>
-        </div>
+        <!-- hidden compat spans (no sidebar) -->
+        <span id="cart-count" style="display:none">0 items</span>
 
-        <!-- ── QB-style main panel ── -->
+        <!-- ── QB-style main panel (full width) ── -->
         <div class="qb-main">
 
           <!-- Top bar: search + customer -->
           <div class="qb-topbar">
-            <div style="display:flex;gap:8px;flex:2;align-items:center">
-              <div class="input-group" style="flex:1">
-                <span class="input-icon">🔍</span>
-                <input class="form-control" id="pos-search" placeholder="Scan or enter item name / SKU…" oninput="renderProductGrid()" style="font-size:14px">
+            <div class="qb-topbar-search">
+              <div class="pos-search-wrap">
+                <div class="input-group">
+                  <span class="input-icon">🔍</span>
+                  <input class="form-control" id="pos-search" placeholder="Search or scan item name / SKU…" oninput="_posSearchInput(this.value)" onkeydown="_posSearchKey(event)" autocomplete="off" style="font-size:14px">
+                </div>
+                <div class="pos-search-dropdown" id="pos-search-dropdown"></div>
               </div>
               <button class="scan-btn" onclick="openBarcodeScanner()" title="Scan Barcode">📷 Scan</button>
             </div>
-            <div style="flex:1;min-width:0">
+            <div class="qb-topbar-customer">
               <select class="form-control" id="pos-customer-select" onchange="onPOSCustomerChange()" style="font-size:13px">
                 <option value="">👤 Walk-in / No Account</option>
               </select>
@@ -960,12 +971,15 @@ th.sort-asc .sort-icon,th.sort-desc .sort-icon{opacity:1;color:var(--green)}
             </div>
           </div>
 
-          <!-- Tier + held bar row -->
+          <!-- Tier + held bar + quick-action buttons -->
           <div class="qb-tier-bar">
-            <span class="qb-tier-label">Price Tier:</span>
+            <span class="qb-tier-label">Tier:</span>
             <button class="tier-btn active" id="tier-retail" onclick="setPricingTier('retail')">🏷 Retail</button>
             <button class="tier-btn" id="tier-wholesale" onclick="setPricingTier('wholesale')">🏢 Wholesale</button>
             <button class="tier-btn" id="tier-transfer" onclick="setPricingTier('transfer')">🔄 Transfer</button>
+            <div style="width:1px;height:18px;background:var(--gray300);margin:0 4px;flex-shrink:0"></div>
+            <button class="qb-action-btn" id="qb-quickpick-btn" onclick="toggleQuickPick()">🛍 Quick Pick</button>
+            <button class="qb-action-btn" onclick="qbGiveDiscount()">🏷 Discount</button>
             <div id="held-bar" class="held-bar" onclick="toggleHeldDrawer()" style="display:none;margin-left:auto;border:none;background:none;padding:0">
               <span>⏸</span><span class="held-bar-count" id="held-bar-count">0</span>
               <span>held</span><span id="held-bar-chevron">▾</span>
@@ -986,16 +1000,17 @@ th.sort-asc .sort-icon,th.sort-desc .sort-icon{opacity:1;color:var(--green)}
             <table class="qb-cart-table">
               <thead>
                 <tr>
-                  <th style="width:32px">#</th>
+                  <th style="width:28px">#</th>
                   <th>Item Name</th>
-                  <th style="width:130px;text-align:center">Qty</th>
-                  <th style="width:110px;text-align:right">Price</th>
-                  <th style="width:120px;text-align:right">Ext. Price</th>
-                  <th style="width:170px;text-align:center">Actions</th>
+                  <th style="width:120px;text-align:center">Qty</th>
+                  <th style="width:90px;text-align:right">Cost</th>
+                  <th style="width:100px;text-align:right">Price</th>
+                  <th style="width:110px;text-align:right">Ext. Price</th>
+                  <th style="width:150px;text-align:center">Actions</th>
                 </tr>
               </thead>
               <tbody id="cart-items">
-                <tr><td colspan="6" style="text-align:center;padding:40px;color:var(--gray400)">
+                <tr><td colspan="7" style="text-align:center;padding:40px;color:var(--gray400)">
                   <div style="font-size:32px;margin-bottom:8px">🛒</div>
                   <div style="font-size:14px;font-weight:600">No items on this receipt</div>
                   <div style="font-size:12px;margin-top:4px">Search for a product above or use Quick Pick</div>
@@ -3575,7 +3590,7 @@ function renderCart(){
   // Render table rows
   const el=document.getElementById('cart-items');
   if(!cart.length){
-    el.innerHTML=`<tr><td colspan="6" style="text-align:center;padding:40px;color:var(--gray400)">
+    el.innerHTML=`<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--gray400)">
       <div style="font-size:32px;margin-bottom:8px">🛒</div>
       <div style="font-size:14px;font-weight:600">No items on this receipt</div>
       <div style="font-size:12px;margin-top:4px">Search for a product above or use Quick Pick</div>
@@ -3586,6 +3601,7 @@ function renderCart(){
     const orig=i.originalPrice||i.sellPrice;
     const isDiscounted=i.sellPrice<orig;
     const discPct=orig>0?Math.round((orig-i.sellPrice)/orig*100):0;
+    const margin=i.buyPrice>0?Math.round((i.sellPrice-i.buyPrice)/i.sellPrice*100):null;
     return`<tr class="qb-cart-row">
       <td style="color:var(--gray400);font-size:12px;font-weight:600">${idx+1}</td>
       <td>
@@ -3607,6 +3623,10 @@ function renderCart(){
           <input class="qty-input" type="number" min="1" max="${i.maxStock}" value="${i.qty}" onclick="this.select()" onchange="setCartQty('${i.productId}',this.value)" onkeydown="if(event.key==='Enter'){this.blur();}">
           <button class="qty-btn" onclick="updateQty('${i.productId}',1)">+</button>
         </div>
+      </td>
+      <td style="text-align:right">
+        <div style="font-size:12px;color:var(--gray500)">${i.buyPrice?kes(i.buyPrice):'—'}</div>
+        ${margin!==null?`<div style="font-size:10px;color:${margin>=20?'var(--green)':'var(--amber)'};font-weight:600">${margin}% mgn</div>`:''}
       </td>
       <td style="text-align:right">
         ${isDiscounted?`<div style="font-size:11px;color:var(--gray400);text-decoration:line-through">${kes(orig)}</div>`:''}
@@ -3633,6 +3653,95 @@ function toggleQuickPick(){
   btn.classList.toggle('active',!isOpen);
   if(!isOpen){renderProductGrid();setTimeout(()=>{const s=document.getElementById('pos-search');if(s)s.focus();},100);}
 }
+
+/* ── POS SEARCH AUTOCOMPLETE ── */
+let _sdFocusIdx=-1;
+
+function _posSearchInput(val){
+  renderProductGrid(); // keep the product grid in sync
+  _renderSearchDropdown(val);
+}
+
+function _renderSearchDropdown(val){
+  const dd=document.getElementById('pos-search-dropdown');
+  if(!dd) return;
+  const q=(val||'').trim().toLowerCase();
+  if(!q){dd.classList.remove('open');dd.innerHTML='';_sdFocusIdx=-1;return;}
+  const today=new Date().toISOString().slice(0,10);
+  const products=DB.all('products');
+  const matches=products.filter(p=>{
+    const nameHit=p.name.toLowerCase().includes(q);
+    const skuHit=(p.sku||'').toLowerCase().includes(q);
+    return nameHit||skuHit;
+  }).slice(0,10);
+  if(!matches.length){
+    dd.innerHTML=`<div class="pos-sd-empty">No products match "<strong>${val}</strong>"</div>`;
+    dd.classList.add('open');
+    _sdFocusIdx=-1;
+    return;
+  }
+  _sdFocusIdx=-1;
+  const activePrice=p=>priceForTier(p,activePricingTier);
+  dd.innerHTML=matches.map((p,i)=>{
+    const oos=p.stock<=0;
+    const expired=p.expiryDate&&p.expiryDate<today;
+    return`<div class="pos-sd-item${oos?' pos-sd-oos-row':''}" data-pid="${p.id}" onmousedown="event.preventDefault();_sdSelectProduct('${p.id}')">
+      <div class="pos-sd-left">
+        <div class="pos-sd-name">${p.name}</div>
+        <div class="pos-sd-meta">SKU: ${p.sku||'—'} · Stock: ${oos?'<span style="color:var(--red)">Out of stock</span>':p.stock}${expired?' · <span style="color:var(--red)">Expired</span>':''}</div>
+      </div>
+      <div class="pos-sd-right">
+        <div class="pos-sd-price">${kes(activePrice(p))}</div>
+        ${p.buyPrice?`<div style="font-size:10px;color:var(--gray400)">Cost: ${kes(p.buyPrice)}</div>`:''}
+      </div>
+    </div>`;
+  }).join('');
+  dd.classList.add('open');
+}
+
+function _sdSelectProduct(productId){
+  addToCart(productId);
+  const inp=document.getElementById('pos-search');
+  if(inp){inp.value='';inp.focus();}
+  const dd=document.getElementById('pos-search-dropdown');
+  if(dd){dd.classList.remove('open');dd.innerHTML='';}
+  renderProductGrid();
+}
+
+function _sdCloseDropdown(){
+  const dd=document.getElementById('pos-search-dropdown');
+  if(dd){dd.classList.remove('open');dd.innerHTML='';}
+  _sdFocusIdx=-1;
+}
+
+function _posSearchKey(e){
+  const dd=document.getElementById('pos-search-dropdown');
+  if(!dd||!dd.classList.contains('open')) return;
+  const items=dd.querySelectorAll('.pos-sd-item');
+  if(!items.length) return;
+  if(e.key==='ArrowDown'){
+    e.preventDefault();
+    _sdFocusIdx=Math.min(_sdFocusIdx+1,items.length-1);
+    items.forEach((el,i)=>el.classList.toggle('focused',i===_sdFocusIdx));
+    items[_sdFocusIdx]?.scrollIntoView({block:'nearest'});
+  } else if(e.key==='ArrowUp'){
+    e.preventDefault();
+    _sdFocusIdx=Math.max(_sdFocusIdx-1,0);
+    items.forEach((el,i)=>el.classList.toggle('focused',i===_sdFocusIdx));
+    items[_sdFocusIdx]?.scrollIntoView({block:'nearest'});
+  } else if(e.key==='Enter'&&_sdFocusIdx>=0){
+    e.preventDefault();
+    const focused=items[_sdFocusIdx];
+    if(focused&&focused.dataset.pid) _sdSelectProduct(focused.dataset.pid);
+  } else if(e.key==='Escape'){
+    _sdCloseDropdown();
+  }
+}
+
+// Close dropdown when clicking outside
+document.addEventListener('click',e=>{
+  if(!e.target.closest('.pos-search-wrap')) _sdCloseDropdown();
+},{passive:true});
 function qbGiveDiscount(){
   if(!cart.length){toast('Add items to the receipt first','warning');return;}
   // Open discount editor on first non-discounted item, or first item
