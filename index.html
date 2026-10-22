@@ -271,6 +271,8 @@ tr:hover td{background:var(--gray50)}
 /* ── MODAL ── */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:500;padding:16px}
 .modal-overlay.hidden{display:none!important}
+/* Document-viewer and receipt modal must float above the bin card modal */
+#docview-modal-overlay,#receipt-modal-overlay{z-index:600}
 .modal{background:var(--white);border-radius:12px;box-shadow:var(--shadow-lg);width:100%;max-height:90vh;overflow-y:auto;display:flex;flex-direction:column}
 .modal-sm{max-width:420px}.modal-md{max-width:560px}.modal-lg{max-width:720px}
 .modal-header{padding:20px 24px;border-bottom:1px solid var(--gray100);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
@@ -440,6 +442,25 @@ th.sort-asc .sort-icon,th.sort-desc .sort-icon{opacity:1;color:var(--green)}
 #page-quotes{display:none;height:100%}
 #page-quotes.active{display:flex;flex-direction:column;height:100%}
 .content.quotes-active{padding:0!important;overflow:hidden!important;}
+
+/* ── PURCHASE ORDERS ── */
+#page-purchase-orders{display:none;height:100%}
+#page-purchase-orders.active{display:flex;flex-direction:column;height:100%}
+.content.po-active{padding:0!important;overflow:hidden!important;}
+.po-status-badge{display:inline-block;padding:2px 9px;border-radius:10px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.03em}
+.po-draft{background:#f3f4f6;color:#374151}
+.po-sent{background:#dbeafe;color:#1d4ed8}
+.po-partial{background:#fef3c7;color:#b45309}
+.po-received{background:#dcfce7;color:#15803d}
+.po-cancelled{background:#fee2e2;color:#dc2626}
+.po-eta-pill{display:inline-block;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:600;white-space:nowrap}
+.po-eta-overdue{background:#fee2e2;color:#dc2626}
+.po-eta-soon{background:#fef3c7;color:#d97706}
+.po-eta-ok{background:#dcfce7;color:#15803d}
+.po-eta-none{background:#f3f4f6;color:#9ca3af}
+.po-summary-card{background:#fff;border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,.08);padding:8px 16px;display:flex;flex-direction:column;align-items:flex-end;min-width:110px}
+.po-summary-card .sc-val{font-size:18px;font-weight:700;color:#1a3354}
+.po-summary-card .sc-lbl{font-size:10px;font-weight:600;text-transform:uppercase;color:var(--gray500);letter-spacing:.04em;margin-top:1px}
 
 /* ── PRICING TIER ── */
 .pricing-tier-bar{display:flex;gap:4px;margin-bottom:8px}
@@ -928,6 +949,10 @@ th.sort-asc .sort-icon,th.sort-desc .sort-icon{opacity:1;color:var(--green)}
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 16l-4-4-4 4"/><path d="M12 12v9"/><path d="M20.39 18.39A5 5 0 0018 9h-1.26A8 8 0 103 16.3"/></svg>
           Receive Stock
         </div>
+        <div class="nav-item" data-page="purchase-orders" onclick="navigate('purchase-orders')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg>
+          Purchase Orders
+        </div>
       </div>
       <!-- Manager / Admin -->
       <div class="nav-section" id="nav-reports-section">
@@ -1376,6 +1401,12 @@ th.sort-asc .sort-icon,th.sort-desc .sort-icon{opacity:1;color:var(--green)}
               <span class="recv-field-label">Date *</span>
               <input class="form-control" type="date" id="recv-date" style="font-size:13px">
             </div>
+            <div class="recv-field-grp" style="min-width:160px;flex:1">
+              <span class="recv-field-label">Link to PO (optional)</span>
+              <select class="form-control" id="recv-link-po" onchange="_recvLinkPO()" style="font-size:13px">
+                <option value="">— None —</option>
+              </select>
+            </div>
           </div>
 
           <!-- Action bar: product search + quick actions -->
@@ -1592,14 +1623,123 @@ th.sort-asc .sort-icon,th.sort-desc .sort-icon{opacity:1;color:var(--green)}
       <!-- ══ PAGE: REPORTS ══ -->
       <div id="page-reports" class="page">
         <div class="report-tabs">
-          <button class="report-tab active" onclick="switchReport('daily')">📅 Daily Sales</button>
-          <button class="report-tab" onclick="switchReport('eod')">🗓 End of Day</button>
-          <button class="report-tab" onclick="switchReport('profit')">💰 Profit & Margin</button>
-          <button class="report-tab" onclick="switchReport('stock')">📦 Stock Levels</button>
-          <button class="report-tab" onclick="switchReport('staff')">👤 Sales by Staff</button>
-          <button class="report-tab" onclick="switchReport('expiry')">⏳ Expiry Tracker</button>
+          <button class="report-tab active" data-report="daily" onclick="switchReport('daily')">📅 Daily Sales</button>
+          <button class="report-tab" data-report="eod" onclick="switchReport('eod')">🗓 End of Day</button>
+          <button class="report-tab" data-report="profit" onclick="switchReport('profit')">💰 Profit & Margin</button>
+          <button class="report-tab" data-report="stock" onclick="switchReport('stock')">📦 Stock Levels</button>
+          <button class="report-tab" data-report="stockval" onclick="switchReport('stockval')">📊 Stock Value</button>
+          <button class="report-tab" data-report="staff" onclick="switchReport('staff')">👤 Sales by Staff</button>
+          <button class="report-tab" data-report="expiry" onclick="switchReport('expiry')">⏳ Expiry Tracker</button>
         </div>
         <div id="report-content"></div>
+      </div>
+
+      <!-- ══ PAGE: PURCHASE ORDERS ══ -->
+      <div id="page-purchase-orders" class="page">
+        <!-- Tab bar -->
+        <div class="recv-tabs">
+          <div class="recv-tab active" id="po-tab-new" onclick="switchPOTab('new')">✏️ New PO</div>
+          <div class="recv-tab" id="po-tab-active" onclick="switchPOTab('active')">📋 Active Orders</div>
+          <div class="recv-tab" id="po-tab-hist" onclick="switchPOTab('hist')">📦 History</div>
+        </div>
+
+        <!-- ── TAB: NEW PO ── -->
+        <div class="recv-tab-panel active" id="po-panel-new">
+          <div class="recv-topbar">
+            <div class="recv-field-grp">
+              <span class="recv-field-label">PO Reference *</span>
+              <input class="form-control" id="po-ref" placeholder="e.g. PO-001" style="font-size:13px">
+            </div>
+            <div class="recv-field-grp">
+              <span class="recv-field-label">Supplier *</span>
+              <select class="form-control" id="po-supplier" style="font-size:13px">
+                <option value="">— Select Supplier —</option>
+              </select>
+            </div>
+            <div class="recv-field-grp" style="max-width:180px;flex:0 0 160px">
+              <span class="recv-field-label">Expected Delivery (ETA)</span>
+              <input class="form-control" type="date" id="po-eta" style="font-size:13px">
+            </div>
+          </div>
+          <div class="recv-action-bar">
+            <div class="recv-search-wrap">
+              <div class="input-group">
+                <span class="input-icon">🔍</span>
+                <input class="form-control" id="po-product-search" placeholder="Search product name or SKU to add to PO…" oninput="_poSearchInput(this.value)" onkeydown="_poSearchKey(event)" autocomplete="off" style="font-size:13px">
+              </div>
+              <div class="pos-search-dropdown" id="po-search-results"></div>
+            </div>
+            <button class="qb-action-btn" onclick="addPOLine()">+ Blank Line</button>
+          </div>
+          <div class="recv-table-wrap">
+            <table class="recv-table">
+              <thead>
+                <tr>
+                  <th style="width:34%">Product</th>
+                  <th style="width:80px;text-align:center">Qty</th>
+                  <th style="width:140px;text-align:right">Unit Cost (KES)</th>
+                  <th style="width:140px;text-align:right">Line Total</th>
+                  <th style="width:38px"></th>
+                </tr>
+              </thead>
+              <tbody id="po-lines-body"></tbody>
+            </table>
+          </div>
+          <div class="recv-notes-bar">
+            <textarea class="form-control" id="po-notes" rows="2" placeholder="Notes / delivery instructions…" style="resize:none;font-size:13px;width:100%"></textarea>
+          </div>
+          <div class="recv-footer">
+            <div class="recv-sum-item">
+              <span class="recv-sum-label">Lines</span>
+              <span class="recv-sum-val" id="po-total-lines">0</span>
+            </div>
+            <div class="recv-sum-item" style="border-right:none;margin-right:0">
+              <span class="recv-sum-label">PO Value</span>
+              <span class="recv-sum-val" id="po-grand-total">KES 0.00</span>
+            </div>
+            <button class="qb-action-btn" onclick="savePO('draft')" style="background:var(--gray200);color:var(--gray700);margin-left:auto">💾 Save Draft</button>
+            <button class="recv-post-btn" onclick="savePO('sent')">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="15" height="15"><polyline points="20 6 9 17 4 12"/></svg>
+              Send PO
+            </button>
+          </div>
+        </div>
+
+        <!-- ── TAB: ACTIVE ORDERS ── -->
+        <div class="recv-tab-panel" id="po-panel-active">
+          <div class="recv-hist-panel">
+            <div style="display:flex;align-items:center;gap:12px;flex-shrink:0;flex-wrap:wrap">
+              <h3 style="margin:0;font-size:14px;font-weight:600">Active Purchase Orders</h3>
+              <div id="po-summary-cards" style="display:flex;gap:8px;flex-wrap:wrap;margin-left:auto"></div>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr><th>PO Ref</th><th>Supplier</th><th>Items</th><th>Value</th><th>ETA</th><th>Status</th><th>Actions</th></tr>
+                </thead>
+                <tbody id="po-active-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── TAB: HISTORY ── -->
+        <div class="recv-tab-panel" id="po-panel-hist">
+          <div class="recv-hist-panel">
+            <div style="display:flex;align-items:center;gap:12px;flex-shrink:0">
+              <h3 style="margin:0;font-size:14px;font-weight:600">PO History</h3>
+              <input class="form-control" id="po-hist-search" placeholder="Search POs…" oninput="renderPOHistory()" style="max-width:260px;font-size:13px;margin-left:auto">
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr><th>Created</th><th>PO Ref</th><th>Supplier</th><th>Items</th><th>Value</th><th>Status</th><th>Actions</th></tr>
+                </thead>
+                <tbody id="po-hist-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- ══ PAGE: USERS ══ -->
@@ -1654,7 +1794,7 @@ th.sort-asc .sort-icon,th.sort-desc .sort-icon{opacity:1;color:var(--green)}
                 <label>Auto-logout after inactivity (minutes) <span style="font-weight:400;color:var(--gray400);font-size:11px">— 0 to disable</span></label>
                 <input class="form-control" type="number" id="set-inactivity" value="30" min="0" max="480" style="max-width:160px">
               </div>
-              <button class="btn btn-primary" onclick="saveSettings()">Save Settings</button>
+              <button class="btn btn-primary" onclick="requireAdminPassword(saveSettings,'Save Business Settings')">Save Settings</button>
             </div>
           </div>
           <div class="card" style="margin-top:16px">
@@ -1678,7 +1818,7 @@ th.sort-asc .sort-icon,th.sort-desc .sort-icon{opacity:1;color:var(--green)}
                 <input class="form-control" id="set-ejs-template" placeholder="e.g. template_xxxxxxx">
               </div>
               <div style="display:flex;gap:8px;flex-wrap:wrap">
-                <button class="btn btn-primary" onclick="saveEmailJSSettings()">Save Email Settings</button>
+                <button class="btn btn-primary" onclick="requireAdminPassword(saveEmailJSSettings,'Save Email Settings')">Save Email Settings</button>
                 <button class="btn btn-secondary" onclick="testEmailJS()">Send Test OTP to My Email</button>
               </div>
             </div>
@@ -1691,7 +1831,7 @@ th.sort-asc .sort-icon,th.sort-desc .sort-icon{opacity:1;color:var(--green)}
                 <span>Staff</span><span>Gross Sales Target</span><span>Net Profit Target</span>
               </div>
               <div id="targets-form" style="display:flex;flex-direction:column;gap:10px"></div>
-              <button class="btn btn-primary" onclick="saveTargets()">Save Targets</button>
+              <button class="btn btn-primary" onclick="requireAdminPassword(saveTargets,'Save Staff Targets')">Save Targets</button>
             </div>
           </div>
           <div class="card" style="margin-top:16px">
@@ -1700,10 +1840,8 @@ th.sort-asc .sort-icon,th.sort-desc .sort-icon{opacity:1;color:var(--green)}
               <p style="font-size:13px;color:var(--gray500);margin:0">Restore points are saved automatically before every stock import or data reset — both on this device (💾) and in the cloud (☁️). Cloud backups are accessible from any device.</p>
               <div style="display:flex;gap:8px;flex-wrap:wrap">
                 <button class="btn btn-secondary" onclick="downloadBackup()">📥 Download Backup (JSON)</button>
-                <label class="btn btn-secondary" style="cursor:pointer">
-                  📤 Restore from File
-                  <input type="file" accept=".json" style="display:none" onchange="restoreFromFile(this.files[0]);this.value=''">
-                </label>
+                <button class="btn btn-secondary" onclick="requireAdminPassword(()=>document.getElementById('restore-file-input').click(),'Restore from Backup File')">📤 Restore from File</button>
+                <input type="file" id="restore-file-input" accept=".json" style="display:none" onchange="restoreFromFile(this.files[0]);this.value='">
                 <button class="btn btn-secondary btn-sm" onclick="createBackupSnapshot('Manual backup');renderBackupList()" style="margin-left:auto">+ Save Restore Point</button>
               </div>
               <div>
@@ -1716,8 +1854,8 @@ th.sort-asc .sort-icon,th.sort-desc .sort-icon{opacity:1;color:var(--green)}
             <div class="card-header"><h3>Data Management</h3></div>
             <div class="card-body" style="display:flex;flex-direction:column;gap:10px">
               <button class="btn btn-secondary" onclick="exportSalesCSV()">📊 Export Sales (CSV)</button>
-              <button class="btn btn-danger" onclick="clearSalesData()">🗑 Clear Sales Data</button>
-              <button class="btn btn-danger" onclick="resetAllData()">⚠ Reset &amp; Reload Demo Data</button>
+              <button class="btn btn-danger" onclick="requireAdminPassword(clearSalesData,'Clear Sales Data')">🗑 Clear Sales Data</button>
+              <button class="btn btn-danger" onclick="requireAdminPassword(resetAllData,'Reset &amp; Reload Demo Data')">⚠ Reset &amp; Reload Demo Data</button>
             </div>
           </div>
         </div>
@@ -1994,6 +2132,28 @@ th.sort-asc .sort-icon,th.sort-desc .sort-icon{opacity:1;color:var(--green)}
     <div class="modal-footer">
       <button class="btn btn-secondary" onclick="closeModal('confirm-modal-overlay')">Cancel</button>
       <button class="btn btn-danger" id="confirm-ok-btn">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<!-- Admin Password Gate Modal -->
+<div class="modal-overlay hidden" id="admin-pw-modal-overlay">
+  <div class="modal modal-sm">
+    <div class="modal-header">
+      <h3 id="admin-pw-modal-title">🔒 Confirm Password</h3>
+      <button class="modal-close" onclick="closeModal('admin-pw-modal-overlay');document.getElementById('admin-pw-input').value=''">✕</button>
+    </div>
+    <div class="modal-body" style="display:flex;flex-direction:column;gap:12px">
+      <p id="admin-pw-modal-msg" style="color:var(--gray600);font-size:13px;margin:0">Enter your password to confirm this action.</p>
+      <div class="form-group">
+        <label>Password</label>
+        <input class="form-control" type="password" id="admin-pw-input" placeholder="Your password" onkeydown="if(event.key==='Enter')_adminPwSubmit()">
+      </div>
+      <p id="admin-pw-error" style="color:var(--red);font-size:12px;display:none;margin:0">Incorrect password. Please try again.</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('admin-pw-modal-overlay');document.getElementById('admin-pw-input').value=''">Cancel</button>
+      <button class="btn btn-primary" onclick="_adminPwSubmit()">Confirm</button>
     </div>
   </div>
 </div>
@@ -3058,10 +3218,10 @@ function _resetInactivity(){
 }
 
 const ROLE_ACCESS={
-  admin:['pos','sales-history','returns','quotes','customers','inventory','inv-history','suppliers','receiving','receipt-history','reports','users','settings','marketing','leaderboard'],
-  manager:['pos','sales-history','returns','quotes','customers','inventory','inv-history','suppliers','receiving','receipt-history','reports','marketing','leaderboard'],
+  admin:['pos','sales-history','returns','quotes','customers','inventory','inv-history','suppliers','receiving','receipt-history','purchase-orders','reports','users','settings','marketing','leaderboard'],
+  manager:['pos','sales-history','returns','quotes','customers','inventory','inv-history','suppliers','receiving','receipt-history','purchase-orders','reports','marketing','leaderboard'],
   cashier:['pos','sales-history','returns','quotes','customers','marketing','leaderboard'],
-  stock:['inventory','inv-history','suppliers','receiving','receipt-history','marketing','leaderboard']
+  stock:['inventory','inv-history','suppliers','receiving','receipt-history','purchase-orders','marketing','leaderboard']
 };
 
 document.getElementById('login-form').addEventListener('submit',async e=>{
@@ -3413,12 +3573,13 @@ function navigate(page){
   if(contentEl) contentEl.classList.toggle('pos-active', page==='pos');
   if(contentEl) contentEl.classList.toggle('recv-active', page==='receiving'||page==='receipt-history');
   if(contentEl) contentEl.classList.toggle('quotes-active', page==='quotes');
+  if(contentEl) contentEl.classList.toggle('po-active', page==='purchase-orders');
   const pageId=page==='receipt-history'?'receiving':page;
   const el=document.getElementById('page-'+pageId);
   if(el) el.classList.add('active');
   const navEl=document.querySelector(`.nav-item[data-page="${page}"]`);
   if(navEl) navEl.classList.add('active');
-  const titles={pos:'Point of Sale',['sales-history']:'Sales History',returns:'Returns & Refunds',quotes:'Quotations',customers:'Customer Accounts',inventory:'Product Inventory',['inv-history']:'Stock History',suppliers:'Supplier Management',receiving:'Invoice Receiving',['receipt-history']:'Receipt History',reports:'Reports',users:'User Management',settings:'Settings',marketing:'Marketing Hub',leaderboard:'🏆 Sales Leaderboard'};
+  const titles={pos:'Point of Sale',['sales-history']:'Sales History',returns:'Returns & Refunds',quotes:'Quotations',customers:'Customer Accounts',inventory:'Product Inventory',['inv-history']:'Stock History',suppliers:'Supplier Management',receiving:'Invoice Receiving',['receipt-history']:'Receipt History',['purchase-orders']:'Purchase Orders',reports:'Reports',users:'User Management',settings:'Settings',marketing:'Marketing Hub',leaderboard:'🏆 Sales Leaderboard'};
   if(page==='marketing') renderMarketingTab();
   if(page==='leaderboard') renderLeaderboardPage();
   document.getElementById('topbar-title').textContent=titles[page]||page;
@@ -3436,6 +3597,7 @@ function navigate(page){
   if(page==='receiving') renderReceiving();
   if(page==='receipt-history'){renderReceiving();switchRecvTab('hist');}
   if(page==='reports') renderReports();
+  if(page==='purchase-orders') renderPurchaseOrders();
   if(page==='users') renderUsers();
   if(page==='settings'){loadSettingsForm();renderBackupList();}
 }
@@ -3728,13 +3890,10 @@ function renderCart(){
       <td style="color:var(--gray400);font-size:12px;font-weight:600">${idx+1}</td>
       <td>
         <div style="font-weight:600;font-size:13px;line-height:1.3">${i.name}</div>
-        ${isDiscounted?`<div style="font-size:11px;color:var(--red);margin-top:2px">🏷 −${discPct}% discount</div>`:''}
+        ${isDiscounted?`<div style="font-size:11px;color:var(--red);margin-top:2px">🏷 −${kes(orig-i.sellPrice)} off</div>`:''}
         ${i.discountOpen?`<div class="disc-input-row" style="margin-top:6px">
-          <input type="number" id="disc-val-${idx}" value="${isDiscounted?discPct:''}" placeholder="Value" min="0" onkeydown="if(event.key==='Enter')applyDiscount(${idx})">
-          <select id="disc-type-${idx}">
-            <option value="pct" ${i.discountType!=='fixed'?'selected':''}>% off</option>
-            <option value="fixed" ${i.discountType==='fixed'?'selected':''}>KES off</option>
-          </select>
+          <span style="font-size:11px;color:var(--gray500);white-space:nowrap;padding:0 4px">KES off</span>
+          <input type="number" id="disc-val-${idx}" value="${isDiscounted?Math.round((orig-i.sellPrice)*100)/100:''}" placeholder="Amount" min="0" onkeydown="if(event.key==='Enter')applyDiscount(${idx})">
           <button class="disc-apply-btn" onclick="applyDiscount(${idx})">Apply</button>
           ${isDiscounted?`<button class="disc-clear-btn" onclick="clearDiscount(${idx})">Clear</button>`:''}
         </div>`:''}
@@ -3882,21 +4041,11 @@ function toggleDiscInput(idx){
 
 function applyDiscount(idx){
   const val=parseFloat(document.getElementById('disc-val-'+idx).value);
-  const type=document.getElementById('disc-type-'+idx).value;
   const orig=cart[idx].originalPrice||cart[idx].sellPrice;
-  if(isNaN(val)||val<0){toast('Enter a valid discount value','error');return;}
-  let newPrice;
-  if(type==='pct'){
-    if(val>100){toast('Discount cannot exceed 100%','error');return;}
-    newPrice=orig*(1-val/100);
-  } else {
-    if(val>orig){toast('Discount cannot exceed item price','error');return;}
-    newPrice=orig-val;
-  }
-  newPrice=Math.round(newPrice*100)/100;
-  if(newPrice<0) newPrice=0;
-  cart[idx].sellPrice=newPrice;
-  cart[idx].discountType=type;
+  if(isNaN(val)||val<0){toast('Enter a valid KES discount amount','error');return;}
+  if(val>=orig){toast(`Discount cannot equal or exceed item price (${kes(orig)})`,'error');return;}
+  cart[idx].sellPrice=Math.max(0,Math.round((orig-val)*100)/100);
+  cart[idx].discountType='fixed';
   cart[idx].discountOpen=false;
   renderCart();
   toast('Discount applied','success');
@@ -4639,6 +4788,17 @@ function saveAdjustment(){
 ════════════════════════════════════════════════ */
 let recvLines=[];
 
+function _nextInvoiceNo(){
+  const receipts=DB.all('receipts')||[];
+  if(!receipts.length) return '';
+  let max=0;
+  receipts.forEach(r=>{
+    const nums=(r.invoiceNo||'').match(/\d+/g);
+    if(nums){const n=parseInt(nums[nums.length-1])||0;if(n>max)max=n;}
+  });
+  return max>0?String(max+1):'';
+}
+
 function renderReceiving(){
   // Populate supplier dropdown
   const supSel=document.getElementById('recv-supplier');
@@ -4648,9 +4808,24 @@ function renderReceiving(){
   sups.sort((a,b)=>a.name.localeCompare(b.name)).forEach(s=>{
     supSel.innerHTML+=`<option value="${s.id}" ${s.id===curVal?'selected':''}>${s.name}</option>`;
   });
+  // Populate Link to PO dropdown with open POs
+  const poSel=document.getElementById('recv-link-po');
+  if(poSel){
+    const curPO=poSel.value;
+    const openPOs=(DB.all('purchase_orders')||[]).filter(p=>p.status==='sent'||p.status==='partial').sort((a,b)=>b.createdAt.localeCompare(a.createdAt));
+    poSel.innerHTML='<option value="">— None —</option>';
+    openPOs.forEach(p=>{
+      poSel.innerHTML+=`<option value="${p.id}" ${p.id===curPO?'selected':''}>${p.poRef} — ${p.supplierName}</option>`;
+    });
+  }
   // Default date to today
   if(!document.getElementById('recv-date').value){
     document.getElementById('recv-date').value=new Date().toISOString().slice(0,10);
+  }
+  // Auto-fill next available invoice number
+  if(!document.getElementById('recv-invoice-no').value){
+    const next=_nextInvoiceNo();
+    if(next) document.getElementById('recv-invoice-no').value=next;
   }
   // Render held receivings
   renderHeldReceivings();
@@ -4932,6 +5107,8 @@ function postReceipt(){
   const recvDate=document.getElementById('recv-date').value;
   const notes=document.getElementById('recv-notes').value.trim();
   if(!invoiceNo){toast('Please enter an invoice / GRN number','error');return;}
+  const dupCheck=DB.all('receipts').find(r=>r.invoiceNo.trim().toLowerCase()===invoiceNo.toLowerCase());
+  if(dupCheck){toast(`Invoice ${invoiceNo} already exists (received ${fmtDate(dupCheck.date)})  — use a different number`,'error');return;}
   if(!supplierId){toast('Please select a supplier','error');return;}
   if(!recvDate){toast('Please set a date','error');return;}
   const validLines=recvLines.filter(ln=>ln.productId&&parseFloat(ln.qty)>0);
@@ -4967,12 +5144,30 @@ function postReceipt(){
   });
 
   const total=items.reduce((s,it)=>s+it.lineTotal,0);
+  const linkedPOId=(document.getElementById('recv-link-po')||{value:''}).value||'';
   DB.push('receipts',{
     id:receiptId,invoiceNo,supplierId,
     supplierName:supplier?supplier.name:'Unknown',
     date:recvDate,notes,items,total,
-    postedBy:currentUser.name,postedAt:ts
+    postedBy:currentUser.name,postedAt:ts,
+    linkedPOId:linkedPOId||undefined
   });
+
+  // Update linked PO status
+  if(linkedPOId){
+    const po=DB.all('purchase_orders').find(p=>p.id===linkedPOId);
+    if(po){
+      // Tally received quantities against PO lines
+      po.items.forEach(pLine=>{
+        const recvd=items.find(ri=>ri.productId===pLine.productId);
+        if(recvd) pLine.receivedQty=(pLine.receivedQty||0)+recvd.qty;
+      });
+      const allFilled=po.items.every(li=>(li.receivedQty||0)>=li.qty);
+      const anyFilled=po.items.some(li=>(li.receivedQty||0)>0);
+      const newStatus=allFilled?'received':anyFilled?'partial':po.status;
+      DB.update('purchase_orders',po.id,{items:po.items,status:newStatus,receivedAt:allFilled?ts:undefined});
+    }
+  }
 
   toast(`Receipt posted — ${items.length} item(s), KES ${total.toLocaleString('en-KE',{minimumFractionDigits:2})}`,'success');
 
@@ -4994,11 +5189,14 @@ function postReceipt(){
 
   // Reset form
   recvLines=[{productId:'',qty:1,unitCost:'',batchNo:'',expiry:''}];
-  document.getElementById('recv-invoice-no').value='';
+  document.getElementById('recv-invoice-no').value=_nextInvoiceNo();
   document.getElementById('recv-supplier').value='';
   document.getElementById('recv-notes').value='';
   document.getElementById('recv-date').value=new Date().toISOString().slice(0,10);
+  const recvPOSel=document.getElementById('recv-link-po');
+  if(recvPOSel) recvPOSel.value='';
   renderRecvLines();
+  renderReceiving();
   renderReceiptHistory();
 }
 
@@ -5036,6 +5234,398 @@ function viewReceipt(id){
   const r=DB.all('receipts').find(x=>x.id===id);
   if(!r) return;
   _viewGRN(r);
+}
+
+/* ════════════════════════════════════════════════
+   PURCHASE ORDERS
+════════════════════════════════════════════════ */
+let poLines=[];
+let _activePOTab='new';
+let _poEditId=null;
+let _poSdFocusIdx=-1;
+
+function _nextPORef(){
+  const pos=DB.all('purchase_orders')||[];
+  if(!pos.length) return 'PO-001';
+  let max=0;
+  pos.forEach(p=>{
+    const nums=(p.poRef||'').match(/\d+/g);
+    if(nums){const n=parseInt(nums[nums.length-1])||0;if(n>max)max=n;}
+  });
+  const next=max+1;
+  return 'PO-'+String(next).padStart(3,'0');
+}
+
+function renderPurchaseOrders(){
+  // Populate supplier dropdown
+  const supSel=document.getElementById('po-supplier');
+  if(!supSel) return;
+  const sups=DB.all('suppliers');
+  const curVal=supSel.value;
+  supSel.innerHTML='<option value="">— Select Supplier —</option>';
+  sups.sort((a,b)=>a.name.localeCompare(b.name)).forEach(s=>{
+    supSel.innerHTML+=`<option value="${s.id}" ${s.id===curVal?'selected':''}>${s.name}</option>`;
+  });
+  // Auto-fill ref if new form and empty
+  const refEl=document.getElementById('po-ref');
+  if(refEl&&!refEl.value&&!_poEditId){
+    refEl.value=_nextPORef();
+  }
+  if(poLines.length===0) poLines.push({productId:'',qty:1,unitCost:''});
+  renderPOLines();
+  switchPOTab(_activePOTab);
+}
+
+function switchPOTab(tab){
+  _activePOTab=tab;
+  ['new','active','hist'].forEach(t=>{
+    document.getElementById('po-tab-'+t)?.classList.toggle('active',t===tab);
+    document.getElementById('po-panel-'+t)?.classList.toggle('active',t===tab);
+  });
+  if(tab==='active') renderActivePOs();
+  if(tab==='hist') renderPOHistory();
+}
+
+/* ── Product search for PO ── */
+function _poSearchInput(val){
+  const q=(val||'').trim().toLowerCase();
+  const dd=document.getElementById('po-search-results');
+  _poSdFocusIdx=-1;
+  if(!q){dd.classList.remove('open');return;}
+  const products=DB.all('products').filter(p=>(p.name||'').toLowerCase().includes(q)||(p.sku||'').toLowerCase().includes(q)).slice(0,10);
+  if(!products.length){dd.innerHTML='<div style="padding:10px 14px;color:var(--gray400);font-size:12px">No products found</div>';dd.classList.add('open');return;}
+  dd.innerHTML=products.map((p,i)=>`
+    <div class="pos-sd-item" data-pid="${p.id}" onmousedown="event.preventDefault();_poPickProduct('${p.id}')">
+      <div class="pos-sd-left">
+        <div class="pos-sd-name">${p.name}</div>
+        <div class="pos-sd-meta">${p.sku?'SKU: '+p.sku:''}</div>
+      </div>
+      <div class="pos-sd-right">
+        <div style="font-weight:700;color:#1a3354;font-size:13px">${kes(p.buyPrice||0)} cost</div>
+      </div>
+    </div>`).join('');
+  dd.classList.add('open');
+}
+
+function _poSearchKey(e){
+  const dd=document.getElementById('po-search-results');
+  const items=dd.querySelectorAll('.pos-sd-item');
+  if(!items.length) return;
+  if(e.key==='ArrowDown'){e.preventDefault();_poSdFocusIdx=Math.min(_poSdFocusIdx+1,items.length-1);items.forEach((el,i)=>el.classList.toggle('focused',i===_poSdFocusIdx));}
+  else if(e.key==='ArrowUp'){e.preventDefault();_poSdFocusIdx=Math.max(_poSdFocusIdx-1,0);items.forEach((el,i)=>el.classList.toggle('focused',i===_poSdFocusIdx));}
+  else if(e.key==='Enter'&&_poSdFocusIdx>=0){e.preventDefault();const pid=items[_poSdFocusIdx].dataset.pid;_poPickProduct(pid);}
+  else if(e.key==='Escape'){dd.classList.remove('open');_poSdFocusIdx=-1;}
+}
+
+function _poPickProduct(pid){
+  const p=DB.all('products').find(x=>x.id===pid);
+  if(!p) return;
+  // Add or increment existing line
+  const existing=poLines.find(ln=>ln.productId===pid);
+  if(existing){existing.qty=(parseInt(existing.qty)||0)+1;}
+  else{poLines.push({productId:pid,qty:1,unitCost:p.buyPrice||''});}
+  document.getElementById('po-product-search').value='';
+  document.getElementById('po-search-results').classList.remove('open');
+  renderPOLines();
+}
+
+function addPOLine(){
+  poLines.push({productId:'',qty:1,unitCost:''});
+  renderPOLines();
+}
+
+function removePOLine(idx){
+  poLines.splice(idx,1);
+  if(!poLines.length) poLines.push({productId:'',qty:1,unitCost:''});
+  renderPOLines();
+}
+
+function renderPOLines(){
+  const tbody=document.getElementById('po-lines-body');
+  if(!tbody) return;
+  const products=DB.all('products');
+  let grandTotal=0;
+  tbody.innerHTML=poLines.map((ln,idx)=>{
+    const lineTotal=(parseFloat(ln.qty)||0)*(parseFloat(ln.unitCost)||0);
+    grandTotal+=lineTotal;
+    const prodOpts=`<option value="">— Select Product —</option>`+products.sort((a,b)=>a.name.localeCompare(b.name)).map(p=>`<option value="${p.id}" ${p.id===ln.productId?'selected':''}>${p.name}${p.sku?' ('+p.sku+')':''}</option>`).join('');
+    return `<tr>
+      <td><select class="recv-table-select" onchange="poLines[${idx}].productId=this.value;const pr=DB.all('products').find(x=>x.id===this.value);if(pr&&!poLines[${idx}].unitCost)poLines[${idx}].unitCost=pr.buyPrice||'';renderPOLines()">${prodOpts}</select></td>
+      <td style="text-align:center"><input type="number" min="1" value="${ln.qty}" style="width:60px;text-align:center;padding:5px 4px;border:1.5px solid var(--gray200);border-radius:5px;font-size:12px" oninput="poLines[${idx}].qty=this.value;renderPOLines()"></td>
+      <td style="text-align:right"><input type="number" min="0" step="0.01" value="${ln.unitCost}" placeholder="0.00" style="width:110px;text-align:right;padding:5px 8px;border:1.5px solid var(--gray200);border-radius:5px;font-size:12px" oninput="poLines[${idx}].unitCost=this.value;renderPOLines()"></td>
+      <td style="text-align:right;font-weight:600;font-size:13px;color:#1a3354">${lineTotal>0?kes(lineTotal):'—'}</td>
+      <td><button class="recv-row-del" onclick="removePOLine(${idx})">✕</button></td>
+    </tr>`;
+  }).join('');
+  document.getElementById('po-total-lines').textContent=poLines.filter(ln=>ln.productId).length;
+  document.getElementById('po-grand-total').textContent=kes(grandTotal);
+}
+
+function resetPOForm(){
+  _poEditId=null;
+  poLines=[{productId:'',qty:1,unitCost:''}];
+  document.getElementById('po-ref').value=_nextPORef();
+  document.getElementById('po-supplier').value='';
+  document.getElementById('po-eta').value='';
+  document.getElementById('po-notes').value='';
+  renderPOLines();
+}
+
+function savePO(status){
+  const poRef=document.getElementById('po-ref').value.trim();
+  const supplierId=document.getElementById('po-supplier').value;
+  const eta=document.getElementById('po-eta').value;
+  const notes=document.getElementById('po-notes').value.trim();
+  if(!poRef){toast('Please enter a PO reference','error');return;}
+  if(!supplierId){toast('Please select a supplier','error');return;}
+  const validLines=poLines.filter(ln=>ln.productId&&parseFloat(ln.qty)>0);
+  if(!validLines.length){toast('Add at least one product line','error');return;}
+  // Duplicate check (only for new POs)
+  if(!_poEditId){
+    const dup=DB.all('purchase_orders').find(p=>p.poRef.trim().toLowerCase()===poRef.toLowerCase());
+    if(dup){toast(`PO reference "${poRef}" already exists — use a different reference`,'error');return;}
+  }
+  const supplier=DB.all('suppliers').find(s=>s.id===supplierId);
+  const items=validLines.map(ln=>{
+    const p=DB.all('products').find(x=>x.id===ln.productId);
+    return {productId:ln.productId,productName:p?p.name:'Unknown',sku:p?p.sku||'':'',qty:parseInt(ln.qty)||0,receivedQty:0,unitCost:parseFloat(ln.unitCost)||0};
+  });
+  const totalValue=items.reduce((s,i)=>s+i.qty*i.unitCost,0);
+  const ts=now();
+  if(_poEditId){
+    DB.update('purchase_orders',_poEditId,{poRef,supplierId,supplierName:supplier?supplier.name:'Unknown',status,items,totalValue,eta:eta||'',notes,updatedAt:ts,sentAt:status==='sent'?ts:undefined});
+    toast(`PO ${poRef} updated`,'success');
+  }else{
+    DB.push('purchase_orders',{id:uid(),poRef,supplierId,supplierName:supplier?supplier.name:'Unknown',status,items,totalValue,eta:eta||'',notes,createdBy:currentUser.name,createdAt:ts,updatedAt:ts,sentAt:status==='sent'?ts:undefined});
+    toast(`PO ${poRef} ${status==='sent'?'sent':'saved as draft'}`,'success');
+  }
+  resetPOForm();
+  renderReceiving(); // refresh PO link dropdown in receiving
+  switchPOTab(status==='draft'?'new':'active');
+}
+
+function editPO(id){
+  const po=DB.all('purchase_orders').find(p=>p.id===id);
+  if(!po) return;
+  _poEditId=id;
+  poLines=po.items.map(i=>({productId:i.productId,qty:i.qty,unitCost:i.unitCost}));
+  if(!poLines.length) poLines.push({productId:'',qty:1,unitCost:''});
+  switchPOTab('new');
+  setTimeout(()=>{
+    document.getElementById('po-ref').value=po.poRef;
+    document.getElementById('po-supplier').value=po.supplierId;
+    document.getElementById('po-eta').value=po.eta||'';
+    document.getElementById('po-notes').value=po.notes||'';
+    renderPOLines();
+  },50);
+}
+
+function cancelPO(id){
+  const po=DB.all('purchase_orders').find(p=>p.id===id);
+  showConfirm('Cancel Purchase Order',`Cancel PO "${po?.poRef}"? This cannot be undone.`,()=>{
+    DB.update('purchase_orders',id,{status:'cancelled',updatedAt:now()});
+    renderActivePOs();
+    renderReceiving();
+    toast('PO cancelled');
+  });
+}
+
+function _poEtaLabel(etaStr){
+  if(!etaStr) return '<span class="po-eta-pill po-eta-none">No ETA</span>';
+  const eta=new Date(etaStr);
+  const today=new Date();today.setHours(0,0,0,0);eta.setHours(0,0,0,0);
+  const diffDays=Math.round((eta-today)/(1000*60*60*24));
+  if(diffDays<0) return `<span class="po-eta-pill po-eta-overdue">⚠ Overdue ${Math.abs(diffDays)}d</span>`;
+  if(diffDays===0) return `<span class="po-eta-pill po-eta-soon">Today</span>`;
+  if(diffDays<=3) return `<span class="po-eta-pill po-eta-soon">In ${diffDays}d</span>`;
+  return `<span class="po-eta-pill po-eta-ok">${eta.toLocaleDateString('en-KE',{day:'2-digit',month:'short'})}</span>`;
+}
+
+function _poStatusBadge(status){
+  const labels={draft:'Draft',sent:'Sent',partial:'Partial',received:'Received',cancelled:'Cancelled'};
+  return `<span class="po-status-badge po-${status}">${labels[status]||status}</span>`;
+}
+
+function renderActivePOs(){
+  const pos=(DB.all('purchase_orders')||[]).filter(p=>p.status==='draft'||p.status==='sent'||p.status==='partial');
+  pos.sort((a,b)=>{
+    // Sort: overdue first, then by ETA, then by created date
+    const etaA=a.eta?new Date(a.eta):new Date('9999-12-31');
+    const etaB=b.eta?new Date(b.eta):new Date('9999-12-31');
+    return etaA-etaB;
+  });
+  // Summary cards
+  const today=new Date();today.setHours(0,0,0,0);
+  const onOrderVal=pos.reduce((s,p)=>s+p.totalValue,0);
+  const overdue=pos.filter(p=>p.eta&&new Date(p.eta)<today&&p.status!=='received').length;
+  const arrivingSoon=pos.filter(p=>{
+    if(!p.eta) return false;
+    const d=new Date(p.eta);d.setHours(0,0,0,0);
+    const diff=Math.round((d-today)/(1000*60*60*24));
+    return diff>=0&&diff<=7;
+  }).length;
+  const cardsEl=document.getElementById('po-summary-cards');
+  if(cardsEl) cardsEl.innerHTML=`
+    <div class="po-summary-card"><span class="sc-val">${pos.length}</span><span class="sc-lbl">Open POs</span></div>
+    <div class="po-summary-card"><span class="sc-val" style="color:${overdue>0?'var(--red)':'inherit'}">${overdue}</span><span class="sc-lbl">Overdue</span></div>
+    <div class="po-summary-card"><span class="sc-val" style="color:var(--amber)">${arrivingSoon}</span><span class="sc-lbl">Arriving ≤7d</span></div>
+    <div class="po-summary-card"><span class="sc-val">${kes(onOrderVal)}</span><span class="sc-lbl">On-Order Value</span></div>`;
+  const tbody=document.getElementById('po-active-tbody');
+  if(!tbody) return;
+  if(!pos.length){
+    tbody.innerHTML='<tr><td colspan="7" style="text-align:center;padding:32px;color:var(--gray400)">No active purchase orders</td></tr>';
+    return;
+  }
+  tbody.innerHTML=pos.map(p=>{
+    const receivedQty=p.items.reduce((s,i)=>s+(i.receivedQty||0),0);
+    const totalQty=p.items.reduce((s,i)=>s+i.qty,0);
+    const prog=totalQty>0?Math.round((receivedQty/totalQty)*100):0;
+    return `<tr>
+      <td><strong style="color:#1a3354">${p.poRef}</strong></td>
+      <td>${p.supplierName}</td>
+      <td>
+        <div style="font-size:12px">${p.items.length} item${p.items.length!==1?'s':''}</div>
+        ${totalQty>0&&receivedQty>0?`<div style="font-size:11px;color:var(--gray500);margin-top:2px">${prog}% received (${receivedQty}/${totalQty} units)</div>`:''}
+      </td>
+      <td style="font-weight:600">${kes(p.totalValue)}</td>
+      <td>${_poEtaLabel(p.eta)}</td>
+      <td>${_poStatusBadge(p.status)}</td>
+      <td>
+        <div class="table-actions">
+          <button class="btn btn-secondary btn-sm" onclick="viewPO('${p.id}')">View</button>
+          ${p.status!=='received'?`<button class="btn btn-secondary btn-sm" onclick="editPO('${p.id}')">Edit</button>`:''}
+          ${p.status!=='cancelled'&&p.status!=='received'?`<button class="btn btn-danger btn-sm" onclick="cancelPO('${p.id}')">Cancel</button>`:''}
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function renderPOHistory(){
+  const q=(document.getElementById('po-hist-search')||{value:''}).value.toLowerCase();
+  let pos=(DB.all('purchase_orders')||[]).filter(p=>p.status==='received'||p.status==='cancelled');
+  if(q) pos=pos.filter(p=>(p.poRef||'').toLowerCase().includes(q)||(p.supplierName||'').toLowerCase().includes(q));
+  pos.sort((a,b)=>b.createdAt.localeCompare(a.createdAt));
+  const tbody=document.getElementById('po-hist-tbody');
+  if(!tbody) return;
+  if(!pos.length){
+    tbody.innerHTML='<tr><td colspan="7" style="text-align:center;padding:32px;color:var(--gray400)">No completed POs yet</td></tr>';
+    return;
+  }
+  tbody.innerHTML=pos.map(p=>`
+    <tr>
+      <td style="font-size:12px;color:var(--gray500)">${fmtDate(p.createdAt)}</td>
+      <td><strong>${p.poRef}</strong></td>
+      <td>${p.supplierName}</td>
+      <td>${p.items.length} item${p.items.length!==1?'s':''}</td>
+      <td style="font-weight:600">${kes(p.totalValue)}</td>
+      <td>${_poStatusBadge(p.status)}</td>
+      <td><button class="btn btn-secondary btn-sm" onclick="viewPO('${p.id}')">View</button></td>
+    </tr>`).join('');
+}
+
+function viewPO(id){
+  const po=DB.all('purchase_orders').find(p=>p.id===id);
+  if(!po) return;
+  const settings=DB.get('settings')||{bizName:'My Business'};
+  const receivedQty=po.items.reduce((s,i)=>s+(i.receivedQty||0),0);
+  const totalQty=po.items.reduce((s,i)=>s+i.qty,0);
+  const html=`
+    <style>
+      .po-doc{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#111;max-width:780px;margin:0 auto;padding:24px}
+      .po-doc-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;padding-bottom:16px;border-bottom:2px solid #1a3354}
+      .po-doc-biz{font-size:22px;font-weight:700;color:#1a3354}
+      .po-doc-ref{text-align:right}
+      .po-doc-ref h2{font-size:18px;font-weight:700;margin:0;color:#1a3354}
+      .po-doc-meta{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;background:#f8fafc;border-radius:8px;padding:14px 16px}
+      .po-meta-row{display:flex;flex-direction:column;gap:2px}
+      .po-meta-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#6b7280}
+      .po-meta-val{font-size:14px;font-weight:600;color:#111}
+      .po-doc table{width:100%;border-collapse:collapse;font-size:13px}
+      .po-doc th{background:#1a3354;color:#c8daf0;padding:8px 12px;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.04em}
+      .po-doc td{padding:9px 12px;border-bottom:1px solid #e5e7eb}
+      .po-doc tfoot td{border-top:2px solid #1a3354;font-weight:700;font-size:15px;padding:10px 12px}
+      .po-notes{margin-top:16px;padding:10px 14px;background:#f8fafc;border-radius:8px;font-size:13px;color:#374151}
+    </style>
+    <div class="po-doc">
+      <div class="po-doc-head">
+        <div>
+          <div class="po-doc-biz">${settings.bizName}</div>
+          <div style="font-size:12px;color:#6b7280;margin-top:4px">PURCHASE ORDER</div>
+        </div>
+        <div class="po-doc-ref">
+          <h2>${po.poRef}</h2>
+          <div style="margin-top:4px">${_poStatusBadge(po.status)}</div>
+        </div>
+      </div>
+      <div class="po-doc-meta">
+        <div class="po-meta-row"><span class="po-meta-lbl">Supplier</span><span class="po-meta-val">${po.supplierName}</span></div>
+        <div class="po-meta-row"><span class="po-meta-lbl">Created</span><span class="po-meta-val">${fmtDate(po.createdAt)}</span></div>
+        <div class="po-meta-row"><span class="po-meta-lbl">Expected Delivery</span><span class="po-meta-val">${po.eta?fmtDate(po.eta)+' '+_poEtaLabel(po.eta):'—'}</span></div>
+        <div class="po-meta-row"><span class="po-meta-lbl">Created By</span><span class="po-meta-val">${po.createdBy}</span></div>
+      </div>
+      <table>
+        <thead><tr><th>Product</th><th>SKU</th><th style="text-align:right">Qty Ordered</th><th style="text-align:right">Qty Received</th><th style="text-align:right">Unit Cost</th><th style="text-align:right">Total</th></tr></thead>
+        <tbody>
+          ${po.items.map(i=>{
+            const rcv=i.receivedQty||0;
+            const rcvStyle=rcv>=i.qty?'color:#15803d':rcv>0?'color:#d97706':'color:#9ca3af';
+            return `<tr>
+              <td><strong>${i.productName}</strong></td>
+              <td style="color:#6b7280;font-size:12px">${i.sku||'—'}</td>
+              <td style="text-align:right">${i.qty}</td>
+              <td style="text-align:right;font-weight:600;${rcvStyle}">${rcv}</td>
+              <td style="text-align:right">${kes(i.unitCost)}</td>
+              <td style="text-align:right;font-weight:600">${kes(i.qty*i.unitCost)}</td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+        <tfoot><tr><td colspan="5" style="text-align:right">TOTAL VALUE</td><td style="text-align:right">${kes(po.totalValue)}</td></tr></tfoot>
+      </table>
+      ${totalQty>0?`<div style="margin-top:12px;font-size:12px;color:#6b7280">Receipt progress: ${receivedQty}/${totalQty} units (${Math.round((receivedQty/totalQty)*100)}%)</div>`:''}
+      ${po.notes?`<div class="po-notes"><strong>Notes:</strong> ${po.notes}</div>`:''}
+    </div>`;
+
+  // Show in a modal overlay
+  let ov=document.getElementById('po-view-overlay');
+  if(!ov){
+    ov=document.createElement('div');
+    ov.id='po-view-overlay';
+    ov.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:600;display:flex;align-items:center;justify-content:center;padding:16px';
+    ov.onclick=e=>{if(e.target===ov)ov.remove();};
+    document.body.appendChild(ov);
+  }
+  ov.innerHTML=`
+    <div style="background:#fff;border-radius:12px;max-width:820px;width:100%;max-height:90vh;overflow:auto;box-shadow:0 20px 60px rgba(0,0,0,.25)">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid #e5e7eb;position:sticky;top:0;background:#fff;z-index:1">
+        <div style="font-weight:700;font-size:15px">Purchase Order — ${po.poRef}</div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-secondary btn-sm" onclick="window.print()">🖨 Print</button>
+          <button class="btn btn-secondary btn-sm" onclick="document.getElementById('po-view-overlay').remove()">✕ Close</button>
+        </div>
+      </div>
+      <div style="padding:4px 0">${html}</div>
+    </div>`;
+}
+
+function _recvLinkPO(){
+  const poId=(document.getElementById('recv-link-po')||{value:''}).value;
+  if(!poId) return;
+  const po=DB.all('purchase_orders').find(p=>p.id===poId);
+  if(!po) return;
+  // Auto-fill supplier
+  document.getElementById('recv-supplier').value=po.supplierId;
+  // Auto-fill lines from PO items (only products not yet fully received)
+  const pendingLines=po.items
+    .filter(i=>(i.receivedQty||0)<i.qty)
+    .map(i=>({productId:i.productId,qty:i.qty-(i.receivedQty||0),unitCost:i.unitCost,batchNo:'',expiry:''}));
+  if(pendingLines.length){
+    recvLines=pendingLines;
+    renderRecvLines();
+    toast(`Loaded ${pendingLines.length} item${pendingLines.length!==1?'s':''} from ${po.poRef}`,'success');
+  }else{
+    toast('All items on this PO have already been received','warning');
+  }
 }
 
 /* ════════════════════════════════════════════════
@@ -5099,9 +5689,8 @@ function _applyRD(key,from,to){
 
 function switchReport(tab){
   activeReport=tab;
-  document.querySelectorAll('.report-tab').forEach((t,i)=>{
-    const tabs=['daily','profit','stock','staff','expiry'];
-    t.classList.toggle('active',tabs[i]===tab);
+  document.querySelectorAll('#page-reports .report-tab').forEach(t=>{
+    t.classList.toggle('active',(t.dataset.report||'')=== tab);
   });
   renderReports();
 }
@@ -5112,6 +5701,7 @@ function renderReports(){
   else if(activeReport==='eod') el.innerHTML=renderEODReport();
   else if(activeReport==='profit') el.innerHTML=renderProfitReport();
   else if(activeReport==='stock') el.innerHTML=renderStockReport();
+  else if(activeReport==='stockval') el.innerHTML=renderStockValueReport();
   else if(activeReport==='staff') el.innerHTML=renderStaffReport();
   else if(activeReport==='expiry') el.innerHTML=renderExpiryReport();
 }
@@ -5563,6 +6153,131 @@ function renderStockReport(){
     </div>`;
 }
 
+function renderStockValueReport(){
+  const products=DB.all('products');
+  const rows=products.map(p=>({
+    ...p,
+    costValue:(p.buyPrice||0)*(p.stock||0),
+    retailValue:(p.sellPrice||0)*(p.stock||0),
+    margin:(p.sellPrice>0&&p.buyPrice>0)?Math.round((p.sellPrice-p.buyPrice)/p.sellPrice*100):null
+  })).filter(p=>(p.stock||0)>0).sort((a,b)=>b.costValue-a.costValue);
+
+  if(!rows.length) return`<div style="padding:48px;text-align:center;color:var(--gray400);font-size:15px">No products with stock on hand.</div>`;
+
+  const totalCost=rows.reduce((s,p)=>s+p.costValue,0);
+  const totalRetail=rows.reduce((s,p)=>s+p.retailValue,0);
+  const totalProfit=totalRetail-totalCost;
+  const overallMargin=totalRetail>0?Math.round(totalProfit/totalRetail*100):0;
+  const totalUnits=rows.reduce((s,p)=>s+(p.stock||0),0);
+
+  // Category breakdown
+  const catMap={};
+  rows.forEach(p=>{
+    const cat=p.category||'Uncategorised';
+    if(!catMap[cat]) catMap[cat]={cost:0,retail:0,skus:0,units:0};
+    catMap[cat].cost+=p.costValue; catMap[cat].retail+=p.retailValue;
+    catMap[cat].skus++; catMap[cat].units+=(p.stock||0);
+  });
+  const catRows=Object.entries(catMap).sort((a,b)=>b[1].cost-a[1].cost);
+
+  return`
+    <div class="stat-grid">
+      <div class="stat-card">
+        <div class="stat-icon" style="background:var(--blue-light)">💰</div>
+        <div class="stat-value" style="font-size:18px">${kes(totalCost)}</div>
+        <div class="stat-label">Stock Value at Cost</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:var(--green-light)">🏷</div>
+        <div class="stat-value" style="font-size:18px">${kes(totalRetail)}</div>
+        <div class="stat-label">Stock Value at Retail</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:var(--amber-light)">📈</div>
+        <div class="stat-value" style="font-size:18px">${kes(totalProfit)}</div>
+        <div class="stat-label">Potential Gross Profit</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:#f3e8ff">📦</div>
+        <div class="stat-value">${totalUnits.toLocaleString()}</div>
+        <div class="stat-label">Total Units · ${rows.length} SKUs · ${overallMargin}% margin</div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-header"><h3>📂 By Category</h3></div>
+      <div class="table-wrap"><table>
+        <thead><tr>
+          <th>Category</th>
+          <th style="text-align:right">SKUs</th>
+          <th style="text-align:right">Units</th>
+          <th style="text-align:right">Cost Value</th>
+          <th style="text-align:right">Retail Value</th>
+          <th style="text-align:right">Share</th>
+        </tr></thead>
+        <tbody>${catRows.map(([cat,c])=>{
+          const share=totalCost>0?Math.round(c.cost/totalCost*100):0;
+          return`<tr>
+            <td><strong>${cat}</strong></td>
+            <td style="text-align:right">${c.skus}</td>
+            <td style="text-align:right">${c.units.toLocaleString()}</td>
+            <td style="text-align:right;font-weight:700">${kes(c.cost)}</td>
+            <td style="text-align:right">${kes(c.retail)}</td>
+            <td style="text-align:right">
+              <div style="display:flex;align-items:center;gap:8px;justify-content:flex-end">
+                <div style="background:var(--gray200);border-radius:4px;width:60px;height:7px;overflow:hidden">
+                  <div style="background:var(--green);height:100%;width:${share}%"></div>
+                </div>
+                <span style="font-size:12px;color:var(--gray500);min-width:28px">${share}%</span>
+              </div>
+            </td>
+          </tr>`;
+        }).join('')}</tbody>
+        <tfoot><tr style="background:var(--gray50);font-weight:700">
+          <td>TOTAL</td><td style="text-align:right">${rows.length}</td>
+          <td style="text-align:right">${totalUnits.toLocaleString()}</td>
+          <td style="text-align:right">${kes(totalCost)}</td>
+          <td style="text-align:right">${kes(totalRetail)}</td>
+          <td style="text-align:right">100%</td>
+        </tr></tfoot>
+      </table></div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><h3>📦 All Products with Stock</h3></div>
+      <div class="table-wrap"><table>
+        <thead><tr>
+          <th>Product</th>
+          <th>Category</th>
+          <th style="text-align:right">Qty</th>
+          <th style="text-align:right">Cost/Unit</th>
+          <th style="text-align:right">Sell/Unit</th>
+          <th style="text-align:right">Cost Value</th>
+          <th style="text-align:right">Retail Value</th>
+          <th style="text-align:right">Margin</th>
+        </tr></thead>
+        <tbody>${rows.map(p=>`<tr>
+          <td><strong>${p.name}</strong></td>
+          <td><span style="font-size:11px;color:var(--gray500)">${p.category||'—'}</span></td>
+          <td style="text-align:right;font-weight:600">${p.stock}</td>
+          <td style="text-align:right;color:var(--gray500)">${p.buyPrice?kes(p.buyPrice):'<span style="color:var(--gray300)">—</span>'}</td>
+          <td style="text-align:right">${kes(p.sellPrice)}</td>
+          <td style="text-align:right;font-weight:700">${kes(p.costValue)}</td>
+          <td style="text-align:right">${kes(p.retailValue)}</td>
+          <td style="text-align:right">${p.margin!==null
+            ?`<span style="font-weight:700;color:${p.margin>=20?'var(--green)':'var(--amber)'}">${p.margin}%</span>`
+            :'<span style="color:var(--gray300)">—</span>'}</td>
+        </tr>`).join('')}</tbody>
+        <tfoot><tr style="background:var(--gray50);font-weight:700;border-top:2px solid var(--gray200)">
+          <td colspan="5" style="text-align:right">TOTAL</td>
+          <td style="text-align:right">${kes(totalCost)}</td>
+          <td style="text-align:right">${kes(totalRetail)}</td>
+          <td style="text-align:right;color:${overallMargin>=20?'var(--green)':'var(--amber)'}">${overallMargin}%</td>
+        </tr></tfoot>
+      </table></div>
+    </div>`;
+}
+
 function renderStaffReport(){
   const grossTargets=DB.get('targets')||{};
   const profitTargets=DB.get('profitTargets')||{};
@@ -5848,6 +6563,36 @@ function confirmDeleteUser(id){
 /* ════════════════════════════════════════════════
    SETTINGS
 ════════════════════════════════════════════════ */
+/* ── Admin Password Gate ── */
+let _adminPwCallback=null;
+function requireAdminPassword(callback, actionLabel){
+  _adminPwCallback=callback;
+  document.getElementById('admin-pw-modal-title').textContent='🔒 Confirm Password';
+  document.getElementById('admin-pw-modal-msg').textContent=`Enter your password to confirm: "${actionLabel||'this action'}"`;
+  document.getElementById('admin-pw-input').value='';
+  document.getElementById('admin-pw-error').style.display='none';
+  openModal('admin-pw-modal-overlay');
+  setTimeout(()=>document.getElementById('admin-pw-input').focus(),120);
+}
+function _adminPwSubmit(){
+  const entered=document.getElementById('admin-pw-input').value;
+  const errEl=document.getElementById('admin-pw-error');
+  if(!currentUser||entered!==currentUser.password){
+    errEl.style.display='block';
+    document.getElementById('admin-pw-input').value='';
+    document.getElementById('admin-pw-input').focus();
+    return;
+  }
+  errEl.style.display='none';
+  closeModal('admin-pw-modal-overlay');
+  document.getElementById('admin-pw-input').value='';
+  if(typeof _adminPwCallback==='function'){
+    const fn=_adminPwCallback;
+    _adminPwCallback=null;
+    fn();
+  }
+}
+
 function loadSettings(){
   const s=DB.get('settings')||{};
   document.getElementById('sb-business').textContent=s.bizName||'Your Business';
