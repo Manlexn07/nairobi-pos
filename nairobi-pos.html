@@ -1794,7 +1794,7 @@ th.sort-asc .sort-icon,th.sort-desc .sort-icon{opacity:1;color:var(--green)}
                 <label>Auto-logout after inactivity (minutes) <span style="font-weight:400;color:var(--gray400);font-size:11px">— 0 to disable</span></label>
                 <input class="form-control" type="number" id="set-inactivity" value="30" min="0" max="480" style="max-width:160px">
               </div>
-              <button class="btn btn-primary" onclick="saveSettings()">Save Settings</button>
+              <button class="btn btn-primary" onclick="requireAdminPassword(saveSettings,'Save Business Settings')">Save Settings</button>
             </div>
           </div>
           <div class="card" style="margin-top:16px">
@@ -1818,7 +1818,7 @@ th.sort-asc .sort-icon,th.sort-desc .sort-icon{opacity:1;color:var(--green)}
                 <input class="form-control" id="set-ejs-template" placeholder="e.g. template_xxxxxxx">
               </div>
               <div style="display:flex;gap:8px;flex-wrap:wrap">
-                <button class="btn btn-primary" onclick="saveEmailJSSettings()">Save Email Settings</button>
+                <button class="btn btn-primary" onclick="requireAdminPassword(saveEmailJSSettings,'Save Email Settings')">Save Email Settings</button>
                 <button class="btn btn-secondary" onclick="testEmailJS()">Send Test OTP to My Email</button>
               </div>
             </div>
@@ -1831,7 +1831,7 @@ th.sort-asc .sort-icon,th.sort-desc .sort-icon{opacity:1;color:var(--green)}
                 <span>Staff</span><span>Gross Sales Target</span><span>Net Profit Target</span>
               </div>
               <div id="targets-form" style="display:flex;flex-direction:column;gap:10px"></div>
-              <button class="btn btn-primary" onclick="saveTargets()">Save Targets</button>
+              <button class="btn btn-primary" onclick="requireAdminPassword(saveTargets,'Save Staff Targets')">Save Targets</button>
             </div>
           </div>
           <div class="card" style="margin-top:16px">
@@ -1840,10 +1840,8 @@ th.sort-asc .sort-icon,th.sort-desc .sort-icon{opacity:1;color:var(--green)}
               <p style="font-size:13px;color:var(--gray500);margin:0">Restore points are saved automatically before every stock import or data reset — both on this device (💾) and in the cloud (☁️). Cloud backups are accessible from any device.</p>
               <div style="display:flex;gap:8px;flex-wrap:wrap">
                 <button class="btn btn-secondary" onclick="downloadBackup()">📥 Download Backup (JSON)</button>
-                <label class="btn btn-secondary" style="cursor:pointer">
-                  📤 Restore from File
-                  <input type="file" accept=".json" style="display:none" onchange="restoreFromFile(this.files[0]);this.value=''">
-                </label>
+                <button class="btn btn-secondary" onclick="requireAdminPassword(()=>document.getElementById('restore-file-input').click(),'Restore from Backup File')">📤 Restore from File</button>
+                <input type="file" id="restore-file-input" accept=".json" style="display:none" onchange="restoreFromFile(this.files[0]);this.value='">
                 <button class="btn btn-secondary btn-sm" onclick="createBackupSnapshot('Manual backup');renderBackupList()" style="margin-left:auto">+ Save Restore Point</button>
               </div>
               <div>
@@ -1856,8 +1854,8 @@ th.sort-asc .sort-icon,th.sort-desc .sort-icon{opacity:1;color:var(--green)}
             <div class="card-header"><h3>Data Management</h3></div>
             <div class="card-body" style="display:flex;flex-direction:column;gap:10px">
               <button class="btn btn-secondary" onclick="exportSalesCSV()">📊 Export Sales (CSV)</button>
-              <button class="btn btn-danger" onclick="clearSalesData()">🗑 Clear Sales Data</button>
-              <button class="btn btn-danger" onclick="resetAllData()">⚠ Reset &amp; Reload Demo Data</button>
+              <button class="btn btn-danger" onclick="requireAdminPassword(clearSalesData,'Clear Sales Data')">🗑 Clear Sales Data</button>
+              <button class="btn btn-danger" onclick="requireAdminPassword(resetAllData,'Reset &amp; Reload Demo Data')">⚠ Reset &amp; Reload Demo Data</button>
             </div>
           </div>
         </div>
@@ -2134,6 +2132,28 @@ th.sort-asc .sort-icon,th.sort-desc .sort-icon{opacity:1;color:var(--green)}
     <div class="modal-footer">
       <button class="btn btn-secondary" onclick="closeModal('confirm-modal-overlay')">Cancel</button>
       <button class="btn btn-danger" id="confirm-ok-btn">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<!-- Admin Password Gate Modal -->
+<div class="modal-overlay hidden" id="admin-pw-modal-overlay">
+  <div class="modal modal-sm">
+    <div class="modal-header">
+      <h3 id="admin-pw-modal-title">🔒 Confirm Password</h3>
+      <button class="modal-close" onclick="closeModal('admin-pw-modal-overlay');document.getElementById('admin-pw-input').value=''">✕</button>
+    </div>
+    <div class="modal-body" style="display:flex;flex-direction:column;gap:12px">
+      <p id="admin-pw-modal-msg" style="color:var(--gray600);font-size:13px;margin:0">Enter your password to confirm this action.</p>
+      <div class="form-group">
+        <label>Password</label>
+        <input class="form-control" type="password" id="admin-pw-input" placeholder="Your password" onkeydown="if(event.key==='Enter')_adminPwSubmit()">
+      </div>
+      <p id="admin-pw-error" style="color:var(--red);font-size:12px;display:none;margin:0">Incorrect password. Please try again.</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('admin-pw-modal-overlay');document.getElementById('admin-pw-input').value=''">Cancel</button>
+      <button class="btn btn-primary" onclick="_adminPwSubmit()">Confirm</button>
     </div>
   </div>
 </div>
@@ -6543,6 +6563,36 @@ function confirmDeleteUser(id){
 /* ════════════════════════════════════════════════
    SETTINGS
 ════════════════════════════════════════════════ */
+/* ── Admin Password Gate ── */
+let _adminPwCallback=null;
+function requireAdminPassword(callback, actionLabel){
+  _adminPwCallback=callback;
+  document.getElementById('admin-pw-modal-title').textContent='🔒 Confirm Password';
+  document.getElementById('admin-pw-modal-msg').textContent=`Enter your password to confirm: "${actionLabel||'this action'}"`;
+  document.getElementById('admin-pw-input').value='';
+  document.getElementById('admin-pw-error').style.display='none';
+  openModal('admin-pw-modal-overlay');
+  setTimeout(()=>document.getElementById('admin-pw-input').focus(),120);
+}
+function _adminPwSubmit(){
+  const entered=document.getElementById('admin-pw-input').value;
+  const errEl=document.getElementById('admin-pw-error');
+  if(!currentUser||entered!==currentUser.password){
+    errEl.style.display='block';
+    document.getElementById('admin-pw-input').value='';
+    document.getElementById('admin-pw-input').focus();
+    return;
+  }
+  errEl.style.display='none';
+  closeModal('admin-pw-modal-overlay');
+  document.getElementById('admin-pw-input').value='';
+  if(typeof _adminPwCallback==='function'){
+    const fn=_adminPwCallback;
+    _adminPwCallback=null;
+    fn();
+  }
+}
+
 function loadSettings(){
   const s=DB.get('settings')||{};
   document.getElementById('sb-business').textContent=s.bizName||'Your Business';
